@@ -1,0 +1,72 @@
+# Visual Studio build artifacts
+*.obj
+*.pdb
+*.idb
+*.pch
+*.ipch
+*.ilk
+*.log
+*.tlog
+*.sbr
+*.tlh
+*.tli
+*.tmp
+*.exe
+*.dll
+*.lib
+*.exp
+*.ncb
+*.sdf
+*.opensdf
+*.cachefile
+*.db
+*.opendb
+
+# Build folders
+[Bb]in/
+[Dd]ebug*/
+[Rr]elease*/
+[xX]64/
+[xX]86/
+[Bb]uild/
+[Oo]ut/
+*.vs/
+.vs/
+
+# CMake intermediate files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Visual Studio user settings
+*.user
+*.userosscache
+*.suo
+*.vcxproj.user
+
+# Backup / temp files
+*.bak
+*.tmp
+*.log
+*.old
+
+# ImGui / GLFW vendor libs (if added as binaries)
+*.lib
+*.dll
+*.a
+*.so
+*.dylib
+
+# Generated files
+*.manifest
+*.iobj
+*.ipdb
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Optional: ignore Visual Studio solution metadata
+*.VC.db
+*.VC.VC.opendb

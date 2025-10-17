@@ -41,8 +41,6 @@ int main()
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -60,9 +58,9 @@ int main()
 
     ImGui::StyleColorsDark();
 
-    // if using viewports, adjust style
     ImGuiStyle& style = ImGui::GetStyle();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) 
+    {
         style.WindowRounding = 0.0f;
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
@@ -70,22 +68,26 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
+    //SystemMonitor* p_sysMon = new SystemMonitor();
+    SystemMonitor sysMon;
+    const double fpsTarget = 120.0;
+    const double frameTimeMS = 1000.0 / fpsTarget;
 
     // render loop
-    // -----------
     while (!glfwWindowShouldClose(window))
     {
-        // input
-        // -----
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        auto frameStartTime = std::chrono::high_resolution_clock::now();
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
         // my code
-        SystemMonitor::RenderUi();
+        //p_sysMon->RenderUi();
+        sysMon.RenderUi();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -99,6 +101,13 @@ int main()
             glfwMakeContextCurrent(backup_current_context);
         }
 
+        auto frameEndTime = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli>
+            elapsedTime = frameEndTime - frameStartTime;
+
+        if (elapsedTime.count() < frameTimeMS)
+            std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(frameTimeMS - elapsedTime.count()));
+
         processInput(window);
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -107,6 +116,7 @@ int main()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+    //delete p_sysMon;
 
     glfwDestroyWindow(window);
     glfwTerminate();

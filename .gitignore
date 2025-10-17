@@ -70,3 +70,4 @@ Thumbs.db
 # Optional: ignore Visual Studio solution metadata
 *.VC.db
 *.VC.VC.opendb
+*.ini

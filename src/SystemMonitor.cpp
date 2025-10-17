@@ -3,21 +3,8 @@
 
 SystemMonitor::SystemMonitor()
 {
-    if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS) 
-        return;
-    if (PdhAddCounter(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS) 
-        return;
-    //SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
-    cpuThread = std::thread([this]()
-    {
-        while (running.load())
-        {
-            PdhCollectQueryData(query);
-            PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
-            cpuValue.store(counterVal.doubleValue);
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-    });
+    getCPUInfo();
+
 }
 
 void SystemMonitor::RenderUi()
@@ -121,8 +108,8 @@ void SystemMonitor::renderCPU()
 {
     ImGui::Begin("CPU");
     ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
-
-
+    ImGui::Separator();
+    ImGui::PlotLines("CPU Usage", cpuHistory.data(), cpuHistory.size(), 0, NULL, 0.0f, 100.0f, ImVec2(0, 80));
     ImGui::End();
 }
 
@@ -134,6 +121,36 @@ void SystemMonitor::renderRAM()
 
 void SystemMonitor::setThreadsForInfo()
 {
+
+}
+
+void SystemMonitor::getCPUInfo()
+{
+    if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
+        return;
+    if (PdhAddCounter(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
+        return;
+
+
+    SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
+    cpuThread = std::thread([this]()
+    {
+        while (running.load())
+        {
+            PdhCollectQueryData(query);
+            PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
+            cpuValue.store(counterVal.doubleValue);
+
+            switch (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal))
+            {
+                case ERROR_SUCCESS:
+                    cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
+                    index = (index + 1) % cpuHistory.size();
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(450));
+        }
+    });
+
 
 }
 

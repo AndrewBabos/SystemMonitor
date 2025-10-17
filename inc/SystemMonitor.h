@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <thread>
 #include <chrono>
-#include <vector>
+#include <array>
 #include <pdh.h>
 #include <pdhmsg.h>
 #include <GLFW/glfw3.h>
@@ -14,14 +14,20 @@
 class SystemMonitor
 {
 private:
-	std::atomic<float> cpuValue = { 0.0 };
+	/*UiController uiCtrl;
+	HardwareController hwCtrl;*/
+
 	std::atomic<bool> running = { true };
 	std::thread cpuThread;
 	PDH_HQUERY query;
 	PDH_HCOUNTER counter;
 	PDH_FMT_COUNTERVALUE counterVal;
 	bool vsync = false;
-	//static std::vector<double> cpu = {};
+
+	// cpu vars
+	std::atomic<float> cpuValue = { 0.0 };
+	std::array<float, 10> cpuHistory {};
+	uint8_t index = 0;
 
 public:
 	SystemMonitor();
@@ -33,6 +39,7 @@ public:
 
 	// get system information (make this a controller eventually as well
 	void setThreadsForInfo();
+	void getCPUInfo();
 	void setVsync();
 	void shutdown();
 	~SystemMonitor();

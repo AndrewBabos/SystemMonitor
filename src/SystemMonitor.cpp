@@ -10,12 +10,21 @@ SystemMonitor::SystemMonitor()
     {
         __cpuid(CPUInfo, i);
         // Interpret CPU brand string
-        if (i == 0x80000002)
+        switch (i)
+        {
+            case (0x80000002):
+                memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+            case (0x80000003):
+                memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+            case (0x80000004):
+                memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+        }
+        /*if (i == 0x80000002)
             memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
         else if (i == 0x80000003)
             memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
         else if (i == 0x80000004)
-            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));*/
     }
     GetSystemInfo(&sysInfo);
     std::cout << "Processor Architecture: " << sysInfo.wProcessorArchitecture << std::endl;
@@ -185,7 +194,7 @@ void SystemMonitor::getCPUInfo()
                     index = (index + 1) % cpuHistory.size();
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(getFreq));
-            //std::this_thread::sleep_for(std::chrono::seconds(2));
+            //std::this_thread::sleep_for(std::chrono::seconds(2)); // task manager update
         }
     });
 

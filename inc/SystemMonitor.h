@@ -9,6 +9,7 @@
 #include <pdh.h>
 #include <pdhmsg.h>
 #include <intrin.h>
+#include <algorithm>
 
 #include <GLFW/glfw3.h>
 
@@ -17,7 +18,8 @@
 
 #pragma comment(lib, "pdh.lib")
 
-#define getFreq 0x1C2
+#define thread_Update 0x1C2 // 450
+#define length_cpuBrandStr 0x40 // 64 bytes length
 
 
 class SystemMonitor
@@ -28,16 +30,14 @@ private:
 
 	// All System Information
 	SYSTEM_INFO sysInfo;
-	int CPUInfo[4] = {};
-	unsigned nExIds, i = 0;
-	char CPUBrandString[0x40];
+	char CPUBrandString[length_cpuBrandStr];
 
 	std::atomic<bool> running = { true };
 	std::thread cpuThread;
 	PDH_HQUERY query;
 	PDH_HCOUNTER counter;
 	PDH_FMT_COUNTERVALUE counterVal;
-	bool vsync = false;
+	bool vsync;
 
 	// cpu vars
 	std::atomic<float> cpuValue = { 0.0 };
@@ -52,12 +52,13 @@ public:
 
 	void renderCPU();
 	void renderRAM();
+	void renderProcesses();
 
 	// get system information (make this a controller eventually as well
 	void setThreadsForInfo();
 	void renderSysInfo();
 	void getCPUInfo();
-	void setVsync();
+	bool setVsync();
 	void shutdown();
 	~SystemMonitor();
 };

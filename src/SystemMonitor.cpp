@@ -3,7 +3,10 @@
 
 SystemMonitor::SystemMonitor()
 {
+    vsync = false;
     // Get the information associated with each extended ID.
+    int CPUInfo[4] = {};
+    unsigned nExIds, i = 0;
     __cpuid(CPUInfo, 0x80000000);
     nExIds = CPUInfo[0];
     for (i = 0x80000000; i <= nExIds; ++i)
@@ -19,12 +22,6 @@ SystemMonitor::SystemMonitor()
             case (0x80000004):
                 memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
         }
-        /*if (i == 0x80000002)
-            memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-        else if (i == 0x80000003)
-            memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-        else if (i == 0x80000004)
-            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));*/
     }
     GetSystemInfo(&sysInfo);
     std::cout << "Processor Architecture: " << sysInfo.wProcessorArchitecture << std::endl;
@@ -33,12 +30,13 @@ SystemMonitor::SystemMonitor()
 
 void SystemMonitor::RenderUi()
 {
-
+    ImGuiIO& io = ImGui::GetIO();
+    static float fontScale = io.FontGlobalScale;
     static bool opt_fullscreen = true;
     static bool opt_padding = false;
     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+    
     if (opt_fullscreen)
     {
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -65,7 +63,6 @@ void SystemMonitor::RenderUi()
         ImGui::PopStyleVar(2);
 
 
-    ImGuiIO& io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
     {
         ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
@@ -84,6 +81,17 @@ void SystemMonitor::RenderUi()
 
             if (ImGui::TreeNode("Options"))
             {
+                // font not done yet
+                if (ImGui::TreeNode("Font"))
+                {
+                    if (ImGui::Button("Up"));// fontScale += 0.1f;
+                    ImGui::SameLine();
+                    if (ImGui::Button("Down")); //fontScale -= 0.1f;
+                    io.FontGlobalScale = fontScale;
+                    ImGui::Text("Not implemented yet");
+                    ImGui::Text("Font Scale: %.1f", fontScale);
+                    ImGui::TreePop();
+                }
                 if (ImGui::MenuItem("Flag: NoDockingOverCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingOverCentralNode) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingOverCentralNode; }
                 if (ImGui::MenuItem("Flag: NoDockingSplit", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingSplit) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingSplit; }
                 if (ImGui::MenuItem("Flag: NoUndocking", "", (dockspace_flags & ImGuiDockNodeFlags_NoUndocking) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoUndocking; }
@@ -93,8 +101,14 @@ void SystemMonitor::RenderUi()
                 if (ImGui::MenuItem("Set Vsync ON/OFF", "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen))
                 {
                     dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode;
+                    /*setVsync();
                     if (vsync)
+                    {
+                        std::cout << "vsync on";
                         glfwSwapInterval(1);
+                    }
+                    else
+                        std::cout << "vsync off";*/
                 }
                 ImGui::TreePop();
             }
@@ -102,28 +116,35 @@ void SystemMonitor::RenderUi()
 
             ImGui::EndMenu();
         }
+        
         if (ImGui::BeginMenu("About"))
         {
+            //ImGui::Separator();
             ImGui::TextUnformatted(
-                "SystemMonitor" "\n\tCreated by: Andrew Babos\n"
+                "SystemMonitor" "\nCreated by: Andrew Babos\n"
                 "A fully customizable and bloat-free system monitor for OS and hardware information." "\n"
-                "\tCreated as a project with C++ using OpenGL, GLFW3, GLAD and Dear ImGui.");
+                "Created as a project with C++ using OpenGL, GLFW3, GLAD and Dear ImGui.\n");
             ImGui::Separator();
-            ImGui::Separator();
-            ImGui::TextUnformatted("When docking is enabled, you can ALWAYS dock MOST windows into another!" "\n"
+            ImGui::Text("Socials");
+            ImGui::TextLinkOpenURL("My website", "https://andrewbabos.ca");
+            ImGui::TextLinkOpenURL("Linkedin", "https://www.linkedin.com/in/andrew-babos");
+            ImGui::TextLinkOpenURL("Github", "https://github.com/AndrewBabos");
+            /*ImGui::TextUnformatted("When docking is enabled, you can ALWAYS dock MOST windows into another!" "\n"
                 "- Drag from window title bar or their tab to dock/undock." "\n"
                 "- Drag from window menu button (upper-left button) to undock an entire node (all windows)." "\n"
                 "- Hold SHIFT to disable docking (if io.ConfigDockingWithShift == false, default)" "\n"
-                "- Hold SHIFT to enable docking (if io.ConfigDockingWithShift == true)");
+                "- Hold SHIFT to enable docking (if io.ConfigDockingWithShift == true)");*/
             ImGui::Separator();
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
     }
 
+
     // show system hardware information
     renderCPU();
     renderSysInfo();
+    renderProcesses();
 
     // references
     ImGui::ShowDemoWindow();
@@ -135,8 +156,6 @@ void SystemMonitor::renderCPU()
 {
     ImGui::Begin("CPU");
     ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
-    //ImGui::Separator();
-    //ImGui::PlotLines(" ", cpuHistory.data(), cpuHistory.size(), 0, NULL, 0.0f, 100.0f, ImVec2(0, 80));
     ImGui::Separator();
     if (ImPlot::BeginPlot("CPU Usage"))
     {
@@ -155,6 +174,49 @@ void SystemMonitor::renderRAM()
 
 }
 
+void SystemMonitor::renderProcesses()
+{
+    // sample, will change
+    ImGui::Begin("Processes");
+    if (ImGui::BeginTable("SystemInfoTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+    {
+        ImGui::TableSetupColumn("Metric");
+        ImGui::TableSetupColumn("Value");
+        ImGui::TableSetupColumn("Unit");
+        ImGui::TableHeadersRow();
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("CPU Usage");
+        ImGui::TableSetColumnIndex(1);
+        //ImGui::Text("%.2f", cpuUsage);
+        ImGui::Text("%.2f");
+        ImGui::TableSetColumnIndex(2);
+        ImGui::Text("%%");
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Memory Usage");
+        ImGui::TableSetColumnIndex(1);
+        //ImGui::Text("%.2f", memUsage);
+        ImGui::Text("%.2f");
+        ImGui::TableSetColumnIndex(2);
+        ImGui::Text("MB");
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Temperature");
+        ImGui::TableSetColumnIndex(1);
+        //ImGui::Text("%.1f", tempC);
+        ImGui::Text("%.1f");
+        ImGui::TableSetColumnIndex(2);
+        ImGui::Text("°C");
+
+        ImGui::EndTable();
+    }
+    ImGui::End();
+}
+
 void SystemMonitor::setThreadsForInfo()
 {
 
@@ -163,7 +225,6 @@ void SystemMonitor::setThreadsForInfo()
 void SystemMonitor::renderSysInfo()
 {
     ImGui::Begin("System Information");
-    //ImGui::Text("Processor: %d", sysInfo.dwNumberOfProcessors);
     ImGui::Text("Processor:          %s", CPUBrandString);
     ImGui::Text("Number of Cores:   %d", sysInfo.dwNumberOfProcessors);
     ImGui::Text("Processor Architecture:   %d", sysInfo.wProcessorArchitecture);
@@ -193,7 +254,7 @@ void SystemMonitor::getCPUInfo()
                     cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
                     index = (index + 1) % cpuHistory.size();
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(getFreq));
+            std::this_thread::sleep_for(std::chrono::milliseconds(thread_Update));
             //std::this_thread::sleep_for(std::chrono::seconds(2)); // task manager update
         }
     });
@@ -201,9 +262,9 @@ void SystemMonitor::getCPUInfo()
 
 }
 
-void SystemMonitor::setVsync()
+bool SystemMonitor::setVsync()
 {
-    vsync = !vsync;
+    return !vsync;
 }
 
 void SystemMonitor::shutdown()

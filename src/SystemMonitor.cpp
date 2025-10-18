@@ -3,8 +3,23 @@
 
 SystemMonitor::SystemMonitor()
 {
+    // Get the information associated with each extended ID.
+    __cpuid(CPUInfo, 0x80000000);
+    nExIds = CPUInfo[0];
+    for (i = 0x80000000; i <= nExIds; ++i)
+    {
+        __cpuid(CPUInfo, i);
+        // Interpret CPU brand string
+        if (i == 0x80000002)
+            memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+        else if (i == 0x80000003)
+            memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+        else if (i == 0x80000004)
+            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+    }
+    GetSystemInfo(&sysInfo);
+    std::cout << "Processor Architecture: " << sysInfo.wProcessorArchitecture << std::endl;
     getCPUInfo();
-
 }
 
 void SystemMonitor::RenderUi()
@@ -58,19 +73,22 @@ void SystemMonitor::RenderUi()
             ImGui::MenuItem("Padding", NULL, &opt_padding);
             ImGui::Separator();
 
-            if (ImGui::MenuItem("Flag: NoDockingOverCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingOverCentralNode) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingOverCentralNode; }
-            if (ImGui::MenuItem("Flag: NoDockingSplit", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingSplit) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingSplit; }
-            if (ImGui::MenuItem("Flag: NoUndocking", "", (dockspace_flags & ImGuiDockNodeFlags_NoUndocking) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoUndocking; }
-            if (ImGui::MenuItem("Flag: NoResize", "", (dockspace_flags & ImGuiDockNodeFlags_NoResize) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoResize; }
-            if (ImGui::MenuItem("Flag: AutoHideTabBar", "", (dockspace_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_AutoHideTabBar; }
-            if (ImGui::MenuItem("Flag: PassthruCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen)) { dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode; }
-            if (ImGui::MenuItem("Set Vsync ON/OFF", "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen))
-            { 
-                dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode; 
-                if (vsync)
-                    glfwSwapInterval(1);
+            if (ImGui::TreeNode("Options"))
+            {
+                if (ImGui::MenuItem("Flag: NoDockingOverCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingOverCentralNode) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingOverCentralNode; }
+                if (ImGui::MenuItem("Flag: NoDockingSplit", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingSplit) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingSplit; }
+                if (ImGui::MenuItem("Flag: NoUndocking", "", (dockspace_flags & ImGuiDockNodeFlags_NoUndocking) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoUndocking; }
+                if (ImGui::MenuItem("Flag: NoResize", "", (dockspace_flags & ImGuiDockNodeFlags_NoResize) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoResize; }
+                if (ImGui::MenuItem("Flag: AutoHideTabBar", "", (dockspace_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_AutoHideTabBar; }
+                if (ImGui::MenuItem("Flag: PassthruCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen)) { dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode; }
+                if (ImGui::MenuItem("Set Vsync ON/OFF", "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen))
+                {
+                    dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode;
+                    if (vsync)
+                        glfwSwapInterval(1);
+                }
+                ImGui::TreePop();
             }
-
             ImGui::Separator();
 
             ImGui::EndMenu();
@@ -96,20 +114,18 @@ void SystemMonitor::RenderUi()
 
     // show system hardware information
     renderCPU();
+    renderSysInfo();
+    ImGui::ShowDemoWindow();
 
-    ImGui::End();
-	ImGui::Begin("SystemMonitor");
-	ImGui::Text("testing stuff");
 	ImGui::End();
 }
-
 
 void SystemMonitor::renderCPU()
 {
     ImGui::Begin("CPU");
     ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
     ImGui::Separator();
-    ImGui::PlotLines("CPU Usage", cpuHistory.data(), cpuHistory.size(), 0, NULL, 0.0f, 100.0f, ImVec2(0, 80));
+    ImGui::PlotLines(" ", cpuHistory.data(), cpuHistory.size(), 0, NULL, 0.0f, 100.0f, ImVec2(0, 80));
     ImGui::End();
 }
 
@@ -124,13 +140,23 @@ void SystemMonitor::setThreadsForInfo()
 
 }
 
+void SystemMonitor::renderSysInfo()
+{
+    ImGui::Begin("System Information");
+    //ImGui::Text("Processor: %d", sysInfo.dwNumberOfProcessors);
+    ImGui::Text("Processor:          %s", CPUBrandString);
+    ImGui::Text("Number of Cores:   %d", sysInfo.dwNumberOfProcessors);
+    ImGui::Text("Processor Architecture:   %d", sysInfo.wProcessorArchitecture);
+    ImGui::Separator();
+    ImGui::End();
+}
+
 void SystemMonitor::getCPUInfo()
 {
     if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
         return;
     if (PdhAddCounter(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
         return;
-
 
     SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
     cpuThread = std::thread([this]()
@@ -147,7 +173,8 @@ void SystemMonitor::getCPUInfo()
                     cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
                     index = (index + 1) % cpuHistory.size();
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(450));
+            std::this_thread::sleep_for(std::chrono::milliseconds(getFreq));
+            //std::this_thread::sleep_for(std::chrono::seconds(2));
         }
     });
 

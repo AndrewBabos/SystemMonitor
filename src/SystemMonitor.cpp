@@ -115,6 +115,8 @@ void SystemMonitor::RenderUi()
     // show system hardware information
     renderCPU();
     renderSysInfo();
+
+    // references
     ImGui::ShowDemoWindow();
 
 	ImGui::End();
@@ -124,8 +126,17 @@ void SystemMonitor::renderCPU()
 {
     ImGui::Begin("CPU");
     ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
+    //ImGui::Separator();
+    //ImGui::PlotLines(" ", cpuHistory.data(), cpuHistory.size(), 0, NULL, 0.0f, 100.0f, ImVec2(0, 80));
     ImGui::Separator();
-    ImGui::PlotLines(" ", cpuHistory.data(), cpuHistory.size(), 0, NULL, 0.0f, 100.0f, ImVec2(0, 80));
+    if (ImPlot::BeginPlot("CPU Usage"))
+    {
+        ImPlot::SetupAxes("", "Percent Used");
+        ImPlot::SetupAxisLimits(ImAxis_X1, 0, cpuHistory.size(), ImGuiCond_Always);
+        ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
+        ImPlot::PlotLine("Usage", cpuHistory.data(), cpuHistory.size());
+        ImPlot::EndPlot();
+    }
     ImGui::End();
 }
 

@@ -125,6 +125,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="imgui\implot.cpp" />
+    <ClCompile Include="imgui\implot_demo.cpp" />
+    <ClCompile Include="imgui\implot_items.cpp" />
     <ClCompile Include="src\HardwareController.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -138,6 +141,8 @@
     <ClCompile Include="src\UiController.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="imgui\implot.h" />
+    <ClInclude Include="imgui\implot_internal.h" />
     <ClInclude Include="inc\HardwareController.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />

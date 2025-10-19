@@ -1,6 +1,5 @@
 #include "../inc/SystemMonitor.h"
 
-
 SystemMonitor::SystemMonitor()
 {
     vsync = false;
@@ -32,6 +31,8 @@ SystemMonitor::SystemMonitor()
     std::cout << "Processor Architecture: " << sysInfo.wProcessorArchitecture << std::endl;
     getCPUInfo();
     //getProcessesInfo();
+    //UiController::fillProcessList(hSnap, pe);
+    fillProcessList(hSnap, pe);
 }
 
 void SystemMonitor::main()

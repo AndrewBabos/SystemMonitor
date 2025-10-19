@@ -1,4 +1,6 @@
 #include "../inc/UiController.h"
+#include <Psapi.h>
+#pragma comment(lib, "psapi.lib")
 
 
 void UiController::renderOptionsAndDockspace()
@@ -192,6 +194,64 @@ void UiController::renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe)
     //ImGui::End();
 }
 
+void fillProcessList(HANDLE& hSnap, PROCESSENTRY32& pe)
+{
+    std::thread([]()
+    {
+        while (true)
+        {
+            HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+            if (hSnap == INVALID_HANDLE_VALUE)
+            {
+                std::cerr << "Failed to create snapshot\n";
+                std::this_thread::sleep_for(std::chrono::seconds(2));
+                continue;
+            }
+
+            PROCESSENTRY32 pe{};
+            pe.dwSize = sizeof(PROCESSENTRY32);
+            std::vector<ProcessInfo> tempList;
+
+            if (Process32First(hSnap, &pe))
+            {
+                do
+                {
+                    ProcessInfo info{};
+                    info.pid = pe.th32ProcessID;
+                    info.name = pe.szExeFile;
+
+                    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe.th32ProcessID);
+                    if (hProcess)
+                    {
+                        PROCESS_MEMORY_COUNTERS pmc{};
+                        if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
+                        {// convert into MB from BYTES somehow
+                            info.memoryUsage = pmc.WorkingSetSize;
+                            //info.memoryUsage = pmc.WorkingSetSize / 1048576;
+                        }
+                        CloseHandle(hProcess);
+                    }
+
+                    tempList.push_back(info);
+                } while (Process32Next(hSnap, &pe));
+            }
+
+            CloseHandle(hSnap);
+            processList = std::move(tempList);
+
+            // debugging
+            for (auto process : processList)
+            {
+                std::string str(process.name.begin(), process.name.end());
+                std::cout << str.c_str() << ", PID: " << process.pid << ", Memory (Bytes): " << process.memoryUsage << std::endl;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            // may have to clear and add it again
+            //processList.clear();
+        }
+    }).detach();
+}
+
 void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe)
 {
     ImGui::Begin("Processes");
@@ -202,6 +262,9 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe)
         | ImGuiTableFlags_ScrollY;
     const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
 
+
+    //fillProcessList(hSnap, pe);
+
     if (ImGui::BeginTable("SystemInfoTable", 5, flags, ImVec2(0.0f, TEXT_BASE_HEIGHT * 15), 0.0f))
     {
         ImGui::TableSetupColumn("Process ID");
@@ -211,6 +274,17 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe)
         ImGui::TableSetupColumn("Network");
         ImGui::TableSetupScrollFreeze(0, 1); // set always visible
         ImGui::TableHeadersRow();
+
+        // this isnt working :p
+        for (ProcessInfo process : processList)
+        {
+            //ImGui::TableNextRow();
+            //ImGui::TableSetColumnIndex(0);
+            std::cout << process.name.c_str();
+            ImGui::TextUnformatted((const char*)process.name.c_str());
+            //ImGui::NextColumn();
+            //ImGui::Selectable((const char*)pe.szExeFile);
+        }
 
         //// figure out how to get this out of the controller
         //if (hSnap == INVALID_HANDLE_VALUE)

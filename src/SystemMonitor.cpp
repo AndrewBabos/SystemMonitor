@@ -4,6 +4,11 @@
 SystemMonitor::SystemMonitor()
 {
     vsync = false;
+
+    // list of processes
+    hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    pe.dwSize = sizeof(PROCESSENTRY32);
+
     // Get the information associated with each extended ID.
     int CPUInfo[4] = {};
     unsigned nExIds, i = 0;
@@ -113,22 +118,24 @@ void SystemMonitor::RenderUi()
                 ImGui::TreePop();
             }
             ImGui::Separator();
-
             ImGui::EndMenu();
         }
         
         if (ImGui::BeginMenu("About"))
         {
             //ImGui::Separator();
-            ImGui::TextUnformatted(
-                "SystemMonitor" "\nCreated by: Andrew Babos\n"
-                "A fully customizable and bloat-free system monitor for OS and hardware information." "\n"
-                "Created as a project with C++ using OpenGL, GLFW3, GLAD and Dear ImGui.\n");
+            ImGui::Text("SystemMonitor");
             ImGui::Separator();
-            ImGui::Text("Socials");
-            ImGui::TextLinkOpenURL("My website", "https://andrewbabos.ca");
-            ImGui::TextLinkOpenURL("Linkedin", "https://www.linkedin.com/in/andrew-babos");
-            ImGui::TextLinkOpenURL("Github", "https://github.com/AndrewBabos");
+            ImGui::TextUnformatted(
+                "Created by: Andrew Babos\n\n"
+                "A fully customizable and bloat-free system monitor for OS and hardware information." "\n"
+                "Created as a project with C++ using OpenGL, GLFW3, GLAD and Dear ImGui, along with\n"
+                "help from ImPlot : )\n");
+            ImGui::Separator();
+            ImGui::Text("My Socials :)");
+            ImGui::TextLinkOpenURL("My website : andrewbabos.ca", "https://andrewbabos.ca");
+            ImGui::TextLinkOpenURL("Linkedin : www.linkedin.com/in/andrew-babos", "https://www.linkedin.com/in/andrew-babos");
+            ImGui::TextLinkOpenURL("Github : github.com/AndrewBabos", "https://github.com/AndrewBabos");
             /*ImGui::TextUnformatted("When docking is enabled, you can ALWAYS dock MOST windows into another!" "\n"
                 "- Drag from window title bar or their tab to dock/undock." "\n"
                 "- Drag from window menu button (upper-left button) to undock an entire node (all windows)." "\n"
@@ -139,7 +146,6 @@ void SystemMonitor::RenderUi()
         }
         ImGui::EndMenuBar();
     }
-
 
     // show system hardware information
     renderCPU();
@@ -178,42 +184,25 @@ void SystemMonitor::renderProcesses()
 {
     // sample, will change
     ImGui::Begin("Processes");
-    if (ImGui::BeginTable("SystemInfoTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+    //getProcessesInfo();
+
+    if (ImGui::BeginTable("SystemInfoTable", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
     {
-        ImGui::TableSetupColumn("Metric");
-        ImGui::TableSetupColumn("Value");
-        ImGui::TableSetupColumn("Unit");
+        ImGui::TableSetupColumn("Process");
+        ImGui::TableSetupColumn("CPU");
+        ImGui::TableSetupColumn("Memory");
+        ImGui::TableSetupColumn("GPU");
+        ImGui::TableSetupColumn("Network");
+        // This row is for processes
         ImGui::TableHeadersRow();
-
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0);
-        ImGui::Text("CPU Usage");
-        ImGui::TableSetColumnIndex(1);
-        //ImGui::Text("%.2f", cpuUsage);
-        ImGui::Text("%.2f");
-        ImGui::TableSetColumnIndex(2);
-        ImGui::Text("%%");
 
-        ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
-        ImGui::Text("Memory Usage");
-        ImGui::TableSetColumnIndex(1);
-        //ImGui::Text("%.2f", memUsage);
-        ImGui::Text("%.2f");
-        ImGui::TableSetColumnIndex(2);
-        ImGui::Text("MB");
-
-        ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
-        ImGui::Text("Temperature");
-        ImGui::TableSetColumnIndex(1);
-        //ImGui::Text("%.1f", tempC);
-        ImGui::Text("%.1f");
-        ImGui::TableSetColumnIndex(2);
-        ImGui::Text("°C");
-
+        // now somehow display
+        ImGui::Text("%S", pe.szExeFile);
         ImGui::EndTable();
     }
+    CloseHandle(hSnap);
     ImGui::End();
 }
 
@@ -258,8 +247,30 @@ void SystemMonitor::getCPUInfo()
             //std::this_thread::sleep_for(std::chrono::seconds(2)); // task manager update
         }
     });
+}
 
+void SystemMonitor::getProcessesInfo()
+{
+    pe.dwSize = sizeof(pe);
+    if (hSnap == INVALID_HANDLE_VALUE)
+    {
+        std::cout << "ERROR GETTING stuff idk\n";
+        return;
+    }
 
+    pe.dwSize = sizeof(PROCESSENTRY32);
+    processThread = std::thread([this]()
+    {
+        if (Process32First(hSnap, &pe))
+        {
+            do
+            {
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("%S", pe.szExeFile); // Unicode safe
+            } while (Process32Next(hSnap, &pe));
+        }
+    });
 }
 
 bool SystemMonitor::setVsync()

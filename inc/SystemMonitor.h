@@ -10,6 +10,7 @@
 #include <pdhmsg.h>
 #include <intrin.h>
 #include <algorithm>
+#include <TlHelp32.h>
 
 #include <GLFW/glfw3.h>
 
@@ -25,8 +26,10 @@
 class SystemMonitor
 {
 private:
+	// controllers
 	//UiController uiCtrl;
 	//HardwareController hwCtrl;
+	//AppConfigController configCtrl;
 
 	// All System Information
 	SYSTEM_INFO sysInfo;
@@ -44,6 +47,11 @@ private:
 	std::array<float, 10> cpuHistory {};
 	uint8_t index = 0;
 
+	// processes
+	std::thread processThread;
+	HANDLE hSnap;
+	PROCESSENTRY32 pe;
+
 public:
 	SystemMonitor();
 
@@ -58,6 +66,7 @@ public:
 	void setThreadsForInfo();
 	void renderSysInfo();
 	void getCPUInfo();
+	void getProcessesInfo();
 	bool setVsync();
 	void shutdown();
 	~SystemMonitor();

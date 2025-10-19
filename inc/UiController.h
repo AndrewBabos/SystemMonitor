@@ -1,6 +1,7 @@
 #pragma once
 #include "imgui.h"
 #include "implot.h"
+#include <iostream>
 #include <atomic>
 #include <array>
 #include <Pdh.h>
@@ -18,6 +19,5 @@ namespace UiController
 	void renderRAM();
 	void renderSysInfo(char CPUBrandString[length_cpuBrandStr], SYSTEM_INFO& sysInfo);
 	void renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe);
-
 };
 

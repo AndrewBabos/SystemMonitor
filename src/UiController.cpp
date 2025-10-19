@@ -135,6 +135,7 @@ void UiController::renderCPU(std::atomic<float>& cpuValue, std::array<float, 10>
 
 void UiController::renderRAM()
 {
+
 }
 
 void UiController::renderSysInfo(char CPUBrandString[length_cpuBrandStr], SYSTEM_INFO& sysInfo)
@@ -155,19 +156,35 @@ void UiController::renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe)
     if (ImGui::BeginTable("SystemInfoTable", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
     {
         ImGui::TableSetupColumn("Process");
+        //ImGui::TableHeadersRow();
         ImGui::TableSetupColumn("CPU");
         ImGui::TableSetupColumn("Memory");
         ImGui::TableSetupColumn("GPU");
         ImGui::TableSetupColumn("Network");
         // This row is for processes
+        //ImGui::TableHeadersRow();
         ImGui::TableHeadersRow();
-        ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
 
-        // now somehow display
-        ImGui::Text("%S", pe.szExeFile);
+        // figure out how to get this out of the controller
+        if (hSnap == INVALID_HANDLE_VALUE)
+        {
+            std::cout << "ERROR GETTING stuff idk\n";
+            return;
+        }
+
+        hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+        pe.dwSize = sizeof(PROCESSENTRY32);
+        if (Process32First(hSnap, &pe))
+        {
+            do
+            {// Process info: pe.th32ProcessID, pe.szExeFile, etc.
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("%S", pe.szExeFile);
+            } while (Process32Next(hSnap, &pe));
+        }
+
         ImGui::EndTable();
     }
-    CloseHandle(hSnap);
     //ImGui::End();
 }

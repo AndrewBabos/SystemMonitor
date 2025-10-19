@@ -54,12 +54,8 @@ private:
 
 public:
 	SystemMonitor();
-
-	// render ui to screen (make this a controller eventually
 	void main(); // name this to MainState
-
-	// get system information (make this a controller eventually as well
-	void setThreadsForInfo();
+	//void setThreadsForInfo();
 	void getCPUInfo();
 	void getProcessesInfo();
 	bool setVsync();

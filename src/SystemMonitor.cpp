@@ -31,7 +31,7 @@ SystemMonitor::SystemMonitor()
     GetSystemInfo(&sysInfo);
     std::cout << "Processor Architecture: " << sysInfo.wProcessorArchitecture << std::endl;
     getCPUInfo();
-    getProcessesInfo();
+    //getProcessesInfo();
 }
 
 void SystemMonitor::main()
@@ -84,25 +84,14 @@ void SystemMonitor::getProcessesInfo()
         return;
     }
 
+    hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     pe.dwSize = sizeof(PROCESSENTRY32);
-    processThread = std::thread([this]()
-    {
-        if (Process32First(hSnap, &pe))
-        {
-            //do
-            //{
-            //    ImGui::TableNextRow();
-            //    ImGui::TableSetColumnIndex(0);
-            //    ImGui::Text("%S", pe.szExeFile); // Unicode safe
-            //} while (Process32Next(hSnap, &pe));
-
-            do 
-            {
-                std::wcout << pe.szExeFile << L" (PID " << pe.th32ProcessID << L")\n";
-            } while (Process32Next(hSnap, &pe));
-        }
-    });
-    //CloseHandle(hSnap);
+    if (Process32First(hSnap, &pe)) {
+        do {
+            // Process info: pe.th32ProcessID, pe.szExeFile, etc.
+        } while (Process32Next(hSnap, &pe));
+    }
+    CloseHandle(hSnap);
 }
 
 bool SystemMonitor::setVsync()

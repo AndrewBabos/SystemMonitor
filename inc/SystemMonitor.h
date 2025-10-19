@@ -27,9 +27,9 @@ class SystemMonitor
 {
 private:
 	// controllers
-	//UiController uiCtrl;
+	//UiController uiCtrl; // not needed
 	//HardwareController hwCtrl;
-	//AppConfigController configCtrl;
+	//AppConfigController configCtrl; // file saving
 
 	// All System Information
 	SYSTEM_INFO sysInfo;
@@ -56,15 +56,10 @@ public:
 	SystemMonitor();
 
 	// render ui to screen (make this a controller eventually
-	void RenderUi(); // name this to MainState
-
-	void renderCPU();
-	void renderRAM();
-	void renderProcesses();
+	void main(); // name this to MainState
 
 	// get system information (make this a controller eventually as well
 	void setThreadsForInfo();
-	void renderSysInfo();
 	void getCPUInfo();
 	void getProcessesInfo();
 	bool setVsync();

@@ -1,18 +1,23 @@
 #pragma once
 #include "imgui.h"
+#include "implot.h"
+#include <atomic>
+#include <array>
 #include <Pdh.h>
+#include <windows.h>
+#include <TlHelp32.h>
 #include <pdhmsg.h>
 
-// probably can be a namespace
-//class UiController
-//{
-//public:
-//	void RenderUi();
-//	void renderCPU(PDH_HQUERY& query, PDH_HCOUNTER& counter, PDH_FMT_COUNTERVALUE& counterVal);
-//	void renderRAM();
-//
-//
-//
-//
-//};
+
+#define length_cpuBrandStr 0x40
+
+namespace UiController
+{
+	void renderOptionsAndDockspace();
+	void renderCPU(std::atomic<float>& cpuValue, std::array<float, 10>& cpuHistory);
+	void renderRAM();
+	void renderSysInfo(char CPUBrandString[length_cpuBrandStr], SYSTEM_INFO& sysInfo);
+	void renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe);
+
+};
 

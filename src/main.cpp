@@ -88,7 +88,7 @@ int main()
 
         // my code
         //p_sysMon->RenderUi();
-        sysMon.RenderUi();
+        sysMon.main();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

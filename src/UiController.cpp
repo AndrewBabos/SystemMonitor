@@ -172,6 +172,7 @@ void UiController::renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe)
             return;
         }
 
+        // figure out how to move this out of the render namespace
         hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
         pe.dwSize = sizeof(PROCESSENTRY32);
         if (Process32First(hSnap, &pe))
@@ -181,10 +182,58 @@ void UiController::renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe)
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
                 ImGui::Text("%S", pe.szExeFile);
+                //ImGui::NextColumn();
+                //ImGui::Selectable((const char*)pe.szExeFile);
             } while (Process32Next(hSnap, &pe));
         }
 
         ImGui::EndTable();
     }
     //ImGui::End();
+}
+
+void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe)
+{
+    ImGui::Begin("Processes");
+    //getProcessesInfo();
+    static ImGuiTableFlags flags =
+        ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti
+        | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_NoBordersInBody
+        | ImGuiTableFlags_ScrollY;
+    const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
+
+    if (ImGui::BeginTable("SystemInfoTable", 5, flags, ImVec2(0.0f, TEXT_BASE_HEIGHT * 15), 0.0f))
+    {
+        ImGui::TableSetupColumn("Process ID");
+        ImGui::TableSetupColumn("CPU");
+        ImGui::TableSetupColumn("Memory");
+        ImGui::TableSetupColumn("GPU");
+        ImGui::TableSetupColumn("Network");
+        ImGui::TableSetupScrollFreeze(0, 1); // set always visible
+        ImGui::TableHeadersRow();
+
+        //// figure out how to get this out of the controller
+        //if (hSnap == INVALID_HANDLE_VALUE)
+        //{
+        //    std::cout << "ERROR GETTING stuff idk\n";
+        //    return;
+        //}
+
+        //// figure out how to move this out of the render namespace
+        //hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+        //pe.dwSize = sizeof(PROCESSENTRY32);
+        //if (Process32First(hSnap, &pe))
+        //{
+        //    do
+        //    {// Process info: pe.th32ProcessID, pe.szExeFile, etc.
+        //        ImGui::TableNextRow();
+        //        ImGui::TableSetColumnIndex(0);
+        //        ImGui::Text("%S", pe.szExeFile);
+        //        //ImGui::NextColumn();
+        //        //ImGui::Selectable((const char*)pe.szExeFile);
+        //    } while (Process32Next(hSnap, &pe));
+        //}
+
+        ImGui::EndTable();
+    }
 }

@@ -40,7 +40,8 @@ void SystemMonitor::main()
     // show system hardware information
     UiController::renderCPU(cpuValue, cpuHistory);
     UiController::renderSysInfo(CPUBrandString, sysInfo);
-    UiController::renderProcesses(hSnap, pe);
+    //UiController::renderProcesses(hSnap, pe);
+    UiController::testingTables(hSnap, pe);
 
     // references
     ImGui::ShowDemoWindow();

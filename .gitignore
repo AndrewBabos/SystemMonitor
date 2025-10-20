@@ -73,3 +73,5 @@ Thumbs.db
 
 # ImGui positions
 *.ini
+packages.config
+/packages

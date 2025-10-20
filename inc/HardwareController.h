@@ -7,6 +7,7 @@
 #include <thread>
 #include <chrono>
 #include <array>
+#include <vector>
 #include <pdh.h>
 #include <pdhmsg.h>
 #include <intrin.h>
@@ -19,7 +20,20 @@
 
 struct CPUInfo
 {
+	uint8_t cores = 0;
+	uint8_t logicalCores = 0;
+	uint16_t baseClockMHz = 0;
+	uint16_t maxClockMHz = 0;
+};
 
+struct ProcessInfo
+{
+	DWORD pid;
+	std::wstring name;
+	float cpuUsage;
+	float memoryUsage;
+	float gpuUsage; // placerholder
+	float network; // placerholder
 };
 
 class HardwareController
@@ -41,6 +55,7 @@ private:
 	std::thread processThread;
 	HANDLE hSnap;
 	PROCESSENTRY32 pe;
+	std::vector<ProcessInfo> processList{};
 
 	// glfw
 	bool vsync;
@@ -53,6 +68,7 @@ public:
 	float getCPUValue() const;
 	const std::array<float, 10>& getCPUHistory() const;
 	void getProcessesInfo();
+	std::vector<ProcessInfo> getProcessList();
 
 };
 

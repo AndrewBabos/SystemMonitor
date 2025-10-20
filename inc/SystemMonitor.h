@@ -26,9 +26,6 @@
 class SystemMonitor
 {
 private:
-	// controllers
-	//UiController uiCtrl; // not needed
-
 	// for some reason this solves the crashing when getting cpu usage info
 	//HardwareController hwCtrl; this doesnt work :)
 	HardwareController* hwCtrl; // this works ?? :)
@@ -40,9 +37,9 @@ private:
 
 	/*std::atomic<bool> running = { true };
 	std::thread cpuThread;*/
-	PDH_HQUERY query;
+	/*PDH_HQUERY query;
 	PDH_HCOUNTER counter;
-	PDH_FMT_COUNTERVALUE counterVal;
+	PDH_FMT_COUNTERVALUE counterVal;*/
 	bool vsync;
 
 	// cpu vars

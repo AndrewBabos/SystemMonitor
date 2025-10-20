@@ -1,4 +1,5 @@
 #include "../inc/HardwareController.h"
+#include <Psapi.h>
 
 
 HardwareController::HardwareController()
@@ -6,8 +7,7 @@ HardwareController::HardwareController()
     hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     pe.dwSize = sizeof(PROCESSENTRY32);
 	vsync = false;
-    GetSystemInfo(&sysInfo);
-    //getCpuInfo(
+
 }
 
 
@@ -80,7 +80,29 @@ const std::array<float, 10>& HardwareController::getCPUHistory() const
     return cpuHistory;
 }
 
+
 void HardwareController::getProcessesInfo()
 {
+    if (hSnap == INVALID_HANDLE_VALUE)
+    {
+        std::cout << "ERROR GETTING stuff idk\n";
+        return;
+    }
 
+    hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    pe.dwSize = sizeof(PROCESSENTRY32);
+    if (Process32First(hSnap, &pe))
+    {
+        do
+        {
+            // Process info: pe.th32ProcessID, pe.szExeFile, etc.
+            processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f});
+        } while (Process32Next(hSnap, &pe));
+    }
+    CloseHandle(hSnap);
+}
+
+std::vector<ProcessInfo> HardwareController::getProcessList()
+{
+    return processList;
 }

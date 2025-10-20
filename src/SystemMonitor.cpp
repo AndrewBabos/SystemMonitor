@@ -10,6 +10,7 @@ SystemMonitor::SystemMonitor()
     pe.dwSize = sizeof(PROCESSENTRY32);
 
     hwCtrl->getCPUInfo();
+    hwCtrl->getProcessesInfo();
 
     //getProcessesInfo();
     //UiController::fillProcessList(hSnap, pe);
@@ -24,7 +25,8 @@ void SystemMonitor::main()
     
     // these 2 are the same
     //UiController::renderProcesses(hSnap, pe);
-    UiController::testingTables(hSnap, pe); // prcesses tabole
+    //fillProcessList(hSnap, pe);
+    UiController::testingTables(hSnap, pe, hwCtrl->getProcessList()); // prcesses tabole
 
     // references
     ImGui::ShowDemoWindow();
@@ -34,20 +36,23 @@ void SystemMonitor::main()
 // move this to hwctrl
 void SystemMonitor::getProcessesInfo()
 {
-    if (hSnap == INVALID_HANDLE_VALUE)
-    {
-        std::cout << "ERROR GETTING stuff idk\n";
-        return;
-    }
+    //if (hSnap == INVALID_HANDLE_VALUE)
+    //{
+    //    std::cout << "ERROR GETTING stuff idk\n";
+    //    return;
+    //}
 
-    hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    pe.dwSize = sizeof(PROCESSENTRY32);
-    if (Process32First(hSnap, &pe)) {
-        do {
-            // Process info: pe.th32ProcessID, pe.szExeFile, etc.
-        } while (Process32Next(hSnap, &pe));
-    }
-    CloseHandle(hSnap);
+    //hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    //pe.dwSize = sizeof(PROCESSENTRY32);
+    //if (Process32First(hSnap, &pe)) 
+    //{
+    //    do 
+    //    {
+    //        // Process info: pe.th32ProcessID, pe.szExeFile, etc.
+
+    //    } while (Process32Next(hSnap, &pe));
+    //}
+    //CloseHandle(hSnap);
 }
 
 bool SystemMonitor::setVsync()
@@ -65,5 +70,5 @@ SystemMonitor::~SystemMonitor()
     /*running.store(false);
     if (cpuThread.joinable()) 
         cpuThread.join();*/
-    PdhCloseQuery(query);
+    //PdhCloseQuery(query);
 }

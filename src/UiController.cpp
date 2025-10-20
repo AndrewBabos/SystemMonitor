@@ -320,6 +320,10 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<
         ImGui::EndTable();
 
 
+        if (ImGui::Button("End Task"))
+        {
+            std::cout << "ended task\n";
+        }
         //// figure out how to get this out of the controller
         //if (hSnap == INVALID_HANDLE_VALUE)
         //{

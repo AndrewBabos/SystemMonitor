@@ -2,6 +2,7 @@
 
 SystemMonitor::SystemMonitor()
 {
+    HardwareController hwCtrl;
     vsync = false;
 
     // list of processes
@@ -9,24 +10,25 @@ SystemMonitor::SystemMonitor()
     pe.dwSize = sizeof(PROCESSENTRY32);
 
     // Get the information associated with each extended ID.
-    int CPUInfo[4] = {};
-    unsigned nExIds, i = 0;
-    __cpuid(CPUInfo, 0x80000000);
-    nExIds = CPUInfo[0];
-    for (i = 0x80000000; i <= nExIds; ++i)
-    {
-        __cpuid(CPUInfo, i);
-        // Interpret CPU brand string
-        switch (i)
-        {
-            case (0x80000002):
-                memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-            case (0x80000003):
-                memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-            case (0x80000004):
-                memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
-        }
-    }
+    //int CPUInfo[4] = {};
+    //unsigned nExIds, i = 0;
+    //__cpuid(CPUInfo, 0x80000000);
+    //nExIds = CPUInfo[0];
+    //for (i = 0x80000000; i <= nExIds; ++i)
+    //{
+    //    __cpuid(CPUInfo, i);
+    //    // Interpret CPU brand string
+    //    switch (i)
+    //    {
+    //        case (0x80000002):
+    //            memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+    //        case (0x80000003):
+    //            memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+    //        case (0x80000004):
+    //            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+    //    }
+    //}
+    hwCtrl.getCPUBrandStr();
     GetSystemInfo(&sysInfo);
     std::cout << "Processor Architecture: " << sysInfo.wProcessorArchitecture << std::endl;
     getCPUInfo();
@@ -40,7 +42,8 @@ void SystemMonitor::main()
     UiController::renderOptionsAndDockspace();
     // show system hardware information
     UiController::renderCPU(cpuValue, cpuHistory);
-    UiController::renderSysInfo(CPUBrandString, sysInfo);
+    //UiController::renderSysInfo(CPUBrandString, sysInfo);
+    UiController::renderSysInfo(hwCtrl.getCPUBrandStr(), sysInfo);
     //UiController::renderProcesses(hSnap, pe);
     UiController::testingTables(hSnap, pe);
 

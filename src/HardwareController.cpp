@@ -42,36 +42,34 @@ void HardwareController::getCPUInfo()
 
 char* HardwareController::getCPUBrandStr()
 {
-    try
+    char CPUBrandString[length_cpuBrandStr];
+    int CPUInfo[4] = {};
+    unsigned nExIds, i = 0;
+    __cpuid(CPUInfo, 0x80000000);
+    nExIds = CPUInfo[0];
+    for (i = 0x80000000; i <= nExIds; ++i)
     {
-        char CPUBrandString[length_cpuBrandStr];
-        int CPUInfo[4] = {};
-        unsigned nExIds, i = 0;
-        __cpuid(CPUInfo, 0x80000000);
-        nExIds = CPUInfo[0];
-        for (i = 0x80000000; i <= nExIds; ++i)
+        __cpuid(CPUInfo, i);
+        // Interpret CPU brand string
+        switch (i)
         {
-            __cpuid(CPUInfo, i);
-            // Interpret CPU brand string
-            switch (i)
-            {
-                case (0x80000002):
-                    memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-                case (0x80000003):
-                    memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-                case (0x80000004):
-                    memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
-            }
+            case (0x80000002):
+                memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+            case (0x80000003):
+                memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+            case (0x80000004):
+                memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
         }
-        return CPUBrandString;
     }
-    catch (std::exception error)
-    {
-        std::cout << "error 74 in HardwareController.cpp\n";
-    }
+    return CPUBrandString;
 }
 
-// THESE WORK
+SYSTEM_INFO& HardwareController::getSysInfo()
+{
+    GetSystemInfo(&sysInfo);
+    return sysInfo;
+}
+
 float HardwareController::getCPUValue() const
 {
     return cpuValue;

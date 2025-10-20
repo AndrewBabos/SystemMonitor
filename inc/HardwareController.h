@@ -14,9 +14,13 @@
 #include <TlHelp32.h>
 //#pragma comment(lib, "pdh.lib")
 
-#define thread_Update 0x1C2 // 450
-#define length_cpuBrandStr 0x40 // 64 bytes length
+#define thread_Update 450 // 0x1C2 (ms)
+#define length_cpuBrandStr 64 // 0x40 64 bytes length
 
+struct CPUInfo
+{
+
+};
 
 class HardwareController
 {
@@ -24,7 +28,6 @@ private:
 	SYSTEM_INFO sysInfo;
 
 	// cpu vars
-	char CPUBrandString[length_cpuBrandStr];
 	std::atomic<bool> running = { true };
 	std::thread cpuThread;
 	PDH_HQUERY query;
@@ -46,6 +49,7 @@ public:
 	HardwareController();
 	void getCPUInfo();
 	char* getCPUBrandStr();
+	SYSTEM_INFO& getSysInfo();
 	float getCPUValue() const;
 	const std::array<float, 10>& getCPUHistory() const;
 	void getProcessesInfo();

@@ -36,20 +36,19 @@ private:
 	//AppConfigController configCtrl; // file saving
 
 	// All System Information
-	SYSTEM_INFO sysInfo;
-	char CPUBrandString[length_cpuBrandStr];
+	SYSTEM_INFO sysInfo; // can probably return this and then display
 
-	std::atomic<bool> running = { true };
-	std::thread cpuThread;
+	/*std::atomic<bool> running = { true };
+	std::thread cpuThread;*/
 	PDH_HQUERY query;
 	PDH_HCOUNTER counter;
 	PDH_FMT_COUNTERVALUE counterVal;
 	bool vsync;
 
 	// cpu vars
-	std::atomic<float> cpuValue = { 0.0 };
+	/*std::atomic<float> cpuValue = { 0.0 };
 	std::array<float, 10> cpuHistory {};
-	uint8_t index = 0;
+	uint8_t index = 0;*/
 
 	// processes
 	std::thread processThread;
@@ -60,7 +59,6 @@ public:
 	SystemMonitor();
 	void main(); // name this to MainState
 	//void setThreadsForInfo();
-	//void getCPUInfo();
 	void getProcessesInfo();
 	bool setVsync();
 	void shutdown();

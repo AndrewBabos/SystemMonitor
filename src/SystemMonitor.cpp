@@ -9,14 +9,6 @@ SystemMonitor::SystemMonitor()
     hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     pe.dwSize = sizeof(PROCESSENTRY32);
 
-    //hwCtrl.getCPUBrandStr();
-    /*cpuHistory = hwCtrl.getCPUHistory();
-    cpuValue = hwCtrl.getCPUValue();*/
-
-    GetSystemInfo(&sysInfo);
-
-    // for some reason it wont update from hwCtrl and crashes
-    //getCPUInfo();
     hwCtrl->getCPUInfo();
 
     //getProcessesInfo();
@@ -26,12 +18,9 @@ SystemMonitor::SystemMonitor()
 
 void SystemMonitor::main()
 {
-    /*cpuValue = hwCtrl.getCPUValue();
-    cpuHistory = hwCtrl.getCPUHistory();*/
     UiController::renderOptionsAndDockspace();
-    //UiController::renderCPU(cpuValue, cpuHistory);
     UiController::renderCPU(hwCtrl->getCPUValue(), hwCtrl->getCPUHistory());
-    UiController::renderSysInfo(hwCtrl->getCPUBrandStr(), sysInfo);
+    UiController::renderSysInfo(hwCtrl->getCPUBrandStr(), hwCtrl->getSysInfo());
     
     // these 2 are the same
     //UiController::renderProcesses(hSnap, pe);
@@ -41,34 +30,8 @@ void SystemMonitor::main()
     ImGui::ShowDemoWindow();
 	ImGui::End();
 }
-//
-//void SystemMonitor::getCPUInfo()
-//{
-//    if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
-//        return;
-//    if (PdhAddCounter(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
-//        return;
-//
-//    SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
-//    cpuThread = std::thread([this]()
-//    {
-//        while (running.load())
-//        {
-//            PdhCollectQueryData(query);
-//            PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
-//            cpuValue.store(counterVal.doubleValue);
-//
-//            switch (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal))
-//                case ERROR_SUCCESS:
-//                    cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
-//                    index = (index + 1) % cpuHistory.size();
-//
-//            std::this_thread::sleep_for(std::chrono::milliseconds(thread_Update));
-//            //std::this_thread::sleep_for(std::chrono::seconds(2)); // task manager update
-//        }
-//    });
-//}
 
+// move this to hwctrl
 void SystemMonitor::getProcessesInfo()
 {
     if (hSnap == INVALID_HANDLE_VALUE)
@@ -98,9 +61,9 @@ void SystemMonitor::shutdown()
 
 SystemMonitor::~SystemMonitor()
 {
-    //delete hwCtrl;
-    running.store(false);
+    //delete hwCtrl; // dont know why this crashes, its literally freeing
+    /*running.store(false);
     if (cpuThread.joinable()) 
-        cpuThread.join();
+        cpuThread.join();*/
     PdhCloseQuery(query);
 }

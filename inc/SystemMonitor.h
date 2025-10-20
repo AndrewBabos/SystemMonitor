@@ -28,7 +28,11 @@ class SystemMonitor
 private:
 	// controllers
 	//UiController uiCtrl; // not needed
-	HardwareController hwCtrl;
+
+	// for some reason this solves the crashing when getting cpu usage info
+	//HardwareController hwCtrl; this doesnt work :)
+	HardwareController* hwCtrl; // this works ?? :)
+
 	//AppConfigController configCtrl; // file saving
 
 	// All System Information
@@ -56,7 +60,7 @@ public:
 	SystemMonitor();
 	void main(); // name this to MainState
 	//void setThreadsForInfo();
-	void getCPUInfo();
+	//void getCPUInfo();
 	void getProcessesInfo();
 	bool setVsync();
 	void shutdown();

@@ -3,41 +3,83 @@
 
 HardwareController::HardwareController()
 {
-	vsync = false;
-    GetSystemInfo(&sysInfo);
-    getCPUBrandStr();
     hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     pe.dwSize = sizeof(PROCESSENTRY32);
+	vsync = false;
+    GetSystemInfo(&sysInfo);
+    //getCpuInfo(
 }
 
 
 void HardwareController::getCPUInfo()
 {
+    if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
+        return;
+    if (PdhAddCounter(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
+        return;
+
+    //SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
+    cpuThread = std::thread([this]()
+    {
+        while (running.load())
+        {
+            PdhCollectQueryData(query);
+            PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
+            cpuValue.store(counterVal.doubleValue);
+            if (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal) == ERROR_SUCCESS)
+            {
+                cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
+                index = (index + 1) % cpuHistory.size();
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(thread_Update));
+                //std::this_thread::sleep_for(std::chrono::seconds(2)); // task manager update
+            }
+        }
+    });
+    SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
 
 }
 
 char* HardwareController::getCPUBrandStr()
 {
-    char CPUBrandString[length_cpuBrandStr];
-    int CPUInfo[4] = {};
-    unsigned nExIds, i = 0;
-    __cpuid(CPUInfo, 0x80000000);
-    nExIds = CPUInfo[0];
-    for (i = 0x80000000; i <= nExIds; ++i)
+    try
     {
-        __cpuid(CPUInfo, i);
-        // Interpret CPU brand string
-        switch (i)
+        char CPUBrandString[length_cpuBrandStr];
+        int CPUInfo[4] = {};
+        unsigned nExIds, i = 0;
+        __cpuid(CPUInfo, 0x80000000);
+        nExIds = CPUInfo[0];
+        for (i = 0x80000000; i <= nExIds; ++i)
         {
-            case (0x80000002):
-                memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-            case (0x80000003):
-                memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-            case (0x80000004):
-                memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+            __cpuid(CPUInfo, i);
+            // Interpret CPU brand string
+            switch (i)
+            {
+                case (0x80000002):
+                    memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+                case (0x80000003):
+                    memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+                case (0x80000004):
+                    memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+            }
         }
+        return CPUBrandString;
     }
-    return CPUBrandString;
+    catch (std::exception error)
+    {
+        std::cout << "error 74 in HardwareController.cpp\n";
+    }
+}
+
+// THESE WORK
+float HardwareController::getCPUValue() const
+{
+    return cpuValue;
+}
+
+const std::array<float, 10>& HardwareController::getCPUHistory() const
+{
+    return cpuHistory;
 }
 
 void HardwareController::getProcessesInfo()

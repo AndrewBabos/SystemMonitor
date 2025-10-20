@@ -2,84 +2,72 @@
 
 SystemMonitor::SystemMonitor()
 {
-    HardwareController hwCtrl;
+    hwCtrl = new HardwareController();
     vsync = false;
 
     // list of processes
     hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     pe.dwSize = sizeof(PROCESSENTRY32);
 
-    // Get the information associated with each extended ID.
-    //int CPUInfo[4] = {};
-    //unsigned nExIds, i = 0;
-    //__cpuid(CPUInfo, 0x80000000);
-    //nExIds = CPUInfo[0];
-    //for (i = 0x80000000; i <= nExIds; ++i)
-    //{
-    //    __cpuid(CPUInfo, i);
-    //    // Interpret CPU brand string
-    //    switch (i)
-    //    {
-    //        case (0x80000002):
-    //            memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-    //        case (0x80000003):
-    //            memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-    //        case (0x80000004):
-    //            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
-    //    }
-    //}
-    hwCtrl.getCPUBrandStr();
+    //hwCtrl.getCPUBrandStr();
+    /*cpuHistory = hwCtrl.getCPUHistory();
+    cpuValue = hwCtrl.getCPUValue();*/
+
     GetSystemInfo(&sysInfo);
-    std::cout << "Processor Architecture: " << sysInfo.wProcessorArchitecture << std::endl;
-    getCPUInfo();
+
+    // for some reason it wont update from hwCtrl and crashes
+    //getCPUInfo();
+    hwCtrl->getCPUInfo();
+
     //getProcessesInfo();
     //UiController::fillProcessList(hSnap, pe);
-    fillProcessList(hSnap, pe);
+    //fillProcessList(hSnap, pe);
 }
 
 void SystemMonitor::main()
 {
+    /*cpuValue = hwCtrl.getCPUValue();
+    cpuHistory = hwCtrl.getCPUHistory();*/
     UiController::renderOptionsAndDockspace();
-    // show system hardware information
-    UiController::renderCPU(cpuValue, cpuHistory);
-    //UiController::renderSysInfo(CPUBrandString, sysInfo);
-    UiController::renderSysInfo(hwCtrl.getCPUBrandStr(), sysInfo);
+    //UiController::renderCPU(cpuValue, cpuHistory);
+    UiController::renderCPU(hwCtrl->getCPUValue(), hwCtrl->getCPUHistory());
+    UiController::renderSysInfo(hwCtrl->getCPUBrandStr(), sysInfo);
+    
+    // these 2 are the same
     //UiController::renderProcesses(hSnap, pe);
-    UiController::testingTables(hSnap, pe);
+    UiController::testingTables(hSnap, pe); // prcesses tabole
 
     // references
     ImGui::ShowDemoWindow();
-
 	ImGui::End();
 }
-
-void SystemMonitor::getCPUInfo()
-{
-    if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
-        return;
-    if (PdhAddCounter(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
-        return;
-
-    SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
-    cpuThread = std::thread([this]()
-    {
-        while (running.load())
-        {
-            PdhCollectQueryData(query);
-            PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
-            cpuValue.store(counterVal.doubleValue);
-
-            switch (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal))
-            {
-                case ERROR_SUCCESS:
-                    cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
-                    index = (index + 1) % cpuHistory.size();
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(thread_Update));
-            //std::this_thread::sleep_for(std::chrono::seconds(2)); // task manager update
-        }
-    });
-}
+//
+//void SystemMonitor::getCPUInfo()
+//{
+//    if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
+//        return;
+//    if (PdhAddCounter(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
+//        return;
+//
+//    SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
+//    cpuThread = std::thread([this]()
+//    {
+//        while (running.load())
+//        {
+//            PdhCollectQueryData(query);
+//            PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
+//            cpuValue.store(counterVal.doubleValue);
+//
+//            switch (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal))
+//                case ERROR_SUCCESS:
+//                    cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
+//                    index = (index + 1) % cpuHistory.size();
+//
+//            std::this_thread::sleep_for(std::chrono::milliseconds(thread_Update));
+//            //std::this_thread::sleep_for(std::chrono::seconds(2)); // task manager update
+//        }
+//    });
+//}
 
 void SystemMonitor::getProcessesInfo()
 {
@@ -110,6 +98,7 @@ void SystemMonitor::shutdown()
 
 SystemMonitor::~SystemMonitor()
 {
+    //delete hwCtrl;
     running.store(false);
     if (cpuThread.joinable()) 
         cpuThread.join();

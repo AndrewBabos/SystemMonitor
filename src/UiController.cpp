@@ -119,14 +119,14 @@ void UiController::renderOptionsAndDockspace()
     ImGui::End();
 }
 
-void UiController::renderCPU(std::atomic<float>& cpuValue, std::array<float, 10>& cpuHistory)
+void UiController::renderCPU(const std::atomic<float>& cpuValue, const std::array<float, 10>& cpuHistory)
 {
     ImGui::Begin("CPU");
     ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
     ImGui::Separator();
     if (ImPlot::BeginPlot("CPU Usage"))
     {
-        ImPlot::SetupAxes("", "Percent Used");
+        ImPlot::SetupAxes("Intervals (Every 450ms)", "Percent Used");
         ImPlot::SetupAxisLimits(ImAxis_X1, 0, cpuHistory.size(), ImGuiCond_Always);
         ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
         ImPlot::PlotLine("Usage", cpuHistory.data(), cpuHistory.size());
@@ -194,6 +194,7 @@ void UiController::renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe)
     //ImGui::End();
 }
 
+// had to throw outside the namespace, cant use thread in non static
 void fillProcessList(HANDLE& hSnap, PROCESSENTRY32& pe)
 {
     std::thread([]()

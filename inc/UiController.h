@@ -22,6 +22,7 @@ struct ProcessInfo
 	SIZE_T memoryUsage;
 };
 
+// had to throw outside the namespace, cant use thread in non static
 static std::vector<ProcessInfo> processList = {};
 void fillProcessList(HANDLE& hSnap, PROCESSENTRY32& pe);
 
@@ -33,7 +34,8 @@ namespace UiController
 	static bool fillProcess = false;
 
 	void renderOptionsAndDockspace();
-	void renderCPU(std::atomic<float>& cpuValue, std::array<float, 10>& cpuHistory);
+	void renderCPU(const std::atomic<float>& cpuValue, 
+				   const std::array<float, 10>& cpuHistory);
 	void renderRAM();
 	void renderSysInfo(char CPUBrandString[length_cpuBrandStr], SYSTEM_INFO& sysInfo);
 	void renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe);

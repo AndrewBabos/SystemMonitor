@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "implot.h"
 #include <iostream>
+#include <cstdint>
 #include <windows.h>
 #include <thread>
 #include <chrono>
@@ -45,6 +46,8 @@ public:
 	HardwareController();
 	void getCPUInfo();
 	char* getCPUBrandStr();
+	float getCPUValue() const;
+	const std::array<float, 10>& getCPUHistory() const;
 	void getProcessesInfo();
 
 };

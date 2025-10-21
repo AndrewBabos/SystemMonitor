@@ -8,6 +8,7 @@
 #include <chrono>
 #include <array>
 #include <vector>
+#include <map>
 #include <pdh.h>
 #include <pdhmsg.h>
 #include <intrin.h>
@@ -61,15 +62,20 @@ private:
 	std::thread processThread;
 	HANDLE hSnap;
 	PROCESSENTRY32 pe;
-	std::vector<ProcessInfo> processList{};
+	//       exe : wstring, list of all same processes
+	std::map<std::wstring, std::vector<ProcessInfo>> processMap;
+	std::vector<ProcessInfo> processList{}; // legacy maybe
 
 	// ram memory
 	std::thread ramThread;
 	MEMORYSTATUSEX memInfo;
 	std::atomic<bool> ramRunning{ true };
 	std::array<float, 10> ramHistory{};
-	std::atomic<float> ramValue;
+	std::atomic<float> ramValue; // percent
+	std::atomic<int> ramUsed, totalPhysRAM;
+
 	uint8_t ramIndex = 0;
+
 	// glfw
 	bool vsync;
 
@@ -86,5 +92,8 @@ public:
 	std::vector<ProcessInfo> getProcessList();
 	std::array<float, 10>& getRAMHistory();
 	std::atomic<float>& getRAMValue();
+	std::atomic<int>& getUsedRAM();
+	std::atomic<int>& getTotalPhysRAM();
+
 };
 

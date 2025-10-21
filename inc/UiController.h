@@ -31,20 +31,21 @@
 
 namespace UiController
 {
-	#define length_cpuBrandStr 0x40
-	//static std::vector<ProcessInfo> processList = {};
-	//static bool fillProcess = false;
-
 	void renderOptionsAndDockspace();
+
 	void renderCPU(const std::atomic<float>& cpuValue, 
 				   const std::array<float, 10>& cpuHistory);
-	void renderRAM(const std::atomic<float>& ramValue, 
-		           const std::array<float, 10>& ramHistory);
+
+	void renderRAM(const std::atomic<float>& ramValue,
+				   const std::array<float, 10>& ramHistory,
+				   const std::atomic<int>& ramUsed,
+				   const std::atomic<int>& totalPhysRAM);
+	
 	void renderSysInfo(char CPUBrandString[length_cpuBrandStr], 
 		               SYSTEM_INFO& sysInfo);
 	void renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe);
 	
-	void fillProcessList(HANDLE& hSnap, PROCESSENTRY32& pe);
+	// still testing
 	void testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<ProcessInfo> processList);
 };
 

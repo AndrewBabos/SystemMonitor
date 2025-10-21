@@ -136,13 +136,19 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, const std::arra
     ImGui::End();
 }
 
-void UiController::renderRAM(const std::atomic<float>& ramValue, const std::array<float, 10>& ramHistory)
+void UiController::renderRAM(const std::atomic<float>& ramValue, 
+                             const std::array<float, 10>& ramHistory, 
+                             const std::atomic<int>& ramUsed,
+                             const std::atomic<int>& totalPhysRAM)
 {
     ImGui::Begin("RAM");
+    //std::cout << ramUsed.load() / (1024 * 1024) << std::endl;
+    //ImGui::Text("%dMB installed", ramUsed.load());
+    //ImGui::Text("%dMB in use", totalPhysRAM.load());
     ImGui::Text("RAM Usage: %.2f%%", ramValue.load());
     if (ImPlot::BeginPlot("RAM Usage"))
     {
-        ImPlot::SetupAxes("Intervals (Every 1s)", "Percent Used");
+        ImPlot::SetupAxes("Intervals (Every 3s)", "Percent Used");
         ImPlot::SetupAxisLimits(ImAxis_X1, 0, ramHistory.size(), ImGuiCond_Always);
         ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
         ImPlot::PlotLine("Usage", ramHistory.data(), ramHistory.size());
@@ -205,65 +211,6 @@ void UiController::renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe)
     //ImGui::End();
 }
 
-// had to throw outside the namespace, cant use thread in non static
-void fillProcessList(HANDLE& hSnap, PROCESSENTRY32& pe)
-{
-    //std::thread([]()
-    //{
-    //    while (true)
-    //    {
-    //        HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    //        if (hSnap == INVALID_HANDLE_VALUE)
-    //        {
-    //            std::cerr << "Failed to create snapshot\n";
-    //            std::this_thread::sleep_for(std::chrono::seconds(2));
-    //            continue;
-    //        }
-
-    //        PROCESSENTRY32 pe{};
-    //        pe.dwSize = sizeof(PROCESSENTRY32);
-    //        std::vector<ProcessInfo> tempList;
-
-    //        if (Process32First(hSnap, &pe))
-    //        {
-    //            do
-    //            {
-    //                ProcessInfo info{};
-    //                info.pid = pe.th32ProcessID;
-    //                info.name = pe.szExeFile;
-
-    //                HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe.th32ProcessID);
-    //                if (hProcess)
-    //                {
-    //                    PROCESS_MEMORY_COUNTERS pmc{};
-    //                    if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
-    //                    {// convert into MB from BYTES somehow
-    //                        info.memoryUsage = pmc.WorkingSetSize;
-    //                        //info.memoryUsage = pmc.WorkingSetSize / 1048576;
-    //                    }
-    //                    CloseHandle(hProcess);
-    //                }
-
-    //                tempList.push_back(info);
-    //            } while (Process32Next(hSnap, &pe));
-    //        }
-
-    //        CloseHandle(hSnap);
-    //        processList = std::move(tempList);
-
-    //        // debugging
-    //        for (auto process : processList)
-    //        {
-    //            std::string str(process.name.begin(), process.name.end());
-    //            std::cout << str.c_str() << ", PID: " << process.pid << ", Memory (Bytes): " << process.memoryUsage << std::endl;
-    //        }
-    //        std::this_thread::sleep_for(std::chrono::seconds(3));
-    //        // may have to clear and add it again
-    //        //processList.clear();
-    //    }
-    //}).detach();
-}
-
 void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<ProcessInfo> processList)
 {
     ImGui::Begin("Processes");
@@ -281,7 +228,7 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<
 
     if (ImGui::BeginTable("ProcessesTable", 6, flags, ImVec2(0.0f, TEXT_BASE_HEIGHT * 15), 0.0f))
     {
-        ImGui::TableSetupColumn("Process ID", ImGuiTableColumnFlags_DefaultSort, 0.0f, 0); // <-- ColumnUserID = 0
+        ImGui::TableSetupColumn("Process ID (PID)", ImGuiTableColumnFlags_DefaultSort, 0.0f, 0); // <-- ColumnUserID = 0
         ImGui::TableSetupColumn("Process Name");
         ImGui::TableSetupColumn("CPU");
         ImGui::TableSetupColumn("Memory");

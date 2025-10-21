@@ -53,7 +53,8 @@ void HardwareController::setRAMInfo()
                 DWORDLONG total = memInfo.ullTotalPhys;
                 DWORDLONG used = total - memInfo.ullAvailPhys;
                 float usedPercent = static_cast<float>((double)used / (double)total * 100.0);
-
+                ramUsed.store(static_cast<int>(used));
+                //totalPhysRAM.store(static_cast<int>((double)used / (double)total));
                 ramValue.store(usedPercent);
                 ramHistory[ramIndex] = usedPercent;
                 ramIndex = (ramIndex + 1) % ramHistory.size();
@@ -61,19 +62,6 @@ void HardwareController::setRAMInfo()
             std::this_thread::sleep_for(std::chrono::seconds(2));
         }
     });
-    /*MEMORYSTATUSEX memInfo;
-    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-    if (GlobalMemoryStatusEx(&memInfo)) 
-    {
-        DWORDLONG total = memInfo.ullTotalPhys;
-        DWORDLONG used = total - memInfo.ullAvailPhys;
-        float usedPercent = static_cast<float>((double)used / (double)total * 100.0);
-
-        ramValue.store(usedPercent);
-        ramHistory[ramIndex] = usedPercent;
-        ramIndex = (ramIndex + 1) % ramHistory.size();
-    }
-    std::this_thread::sleep_for(std::chrono::seconds(1));*/
 }
 
 MEMORYSTATUSEX HardwareController::getRAM() const
@@ -157,4 +145,14 @@ std::atomic<float>& HardwareController::getRAMValue()
 {
     return ramValue;
     // return ramValue.load();
+}
+
+std::atomic<int>& HardwareController::getUsedRAM()
+{
+    return ramUsed;
+}
+
+std::atomic<int>& HardwareController::getTotalPhysRAM()
+{
+    return totalPhysRAM;
 }

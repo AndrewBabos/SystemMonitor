@@ -40,6 +40,24 @@ void HardwareController::getCPUInfo()
 
 }
 
+void HardwareController::setRAMInfo()
+{
+    //MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    if (GlobalMemoryStatusEx(&memInfo))
+    {
+        DWORDLONG totalPhys = memInfo.ullTotalPhys;
+        DWORDLONG usedPhys = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
+        std::cout << "Total RAM: " << totalPhys / (1024 * 1024) << " MB\n";
+        std::cout << "Used RAM: " << usedPhys / (1024 * 1024) << " MB\n";
+    }
+}
+
+MEMORYSTATUSEX HardwareController::getRAM()
+{
+    return MEMORYSTATUSEX();
+}
+
 char* HardwareController::getCPUBrandStr()
 {
     char CPUBrandString[length_cpuBrandStr];

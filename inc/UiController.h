@@ -38,7 +38,7 @@ namespace UiController
 	void renderOptionsAndDockspace();
 	void renderCPU(const std::atomic<float>& cpuValue, 
 				   const std::array<float, 10>& cpuHistory);
-	void renderRAM();
+	void renderRAM(MEMORYSTATUSEX memInfo);
 	void renderSysInfo(char CPUBrandString[length_cpuBrandStr], 
 		               SYSTEM_INFO& sysInfo);
 	void renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe);

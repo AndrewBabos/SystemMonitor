@@ -57,12 +57,17 @@ private:
 	PROCESSENTRY32 pe;
 	std::vector<ProcessInfo> processList{};
 
+	// ram memory
+	MEMORYSTATUSEX memInfo;
+
 	// glfw
 	bool vsync;
 
 public:
 	HardwareController();
 	void getCPUInfo();
+	void setRAMInfo();
+	MEMORYSTATUSEX getRAM();
 	char* getCPUBrandStr();
 	SYSTEM_INFO& getSysInfo();
 	float getCPUValue() const;

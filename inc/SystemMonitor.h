@@ -19,33 +19,33 @@
 
 #pragma comment(lib, "pdh.lib")
 
-#define thread_Update 0x1C2 // 450
-#define length_cpuBrandStr 0x40 // 64 bytes length
+//#define thread_Update 0x1C2 // 450
+//#define length_cpuBrandStr 0x40 // 64 bytes length
 
 
 class SystemMonitor
 {
 private:
-	// controllers
-	//UiController uiCtrl;
-	//HardwareController hwCtrl;
-	//AppConfigController configCtrl;
+	// for some reason this solves the crashing when getting cpu usage info
+	//HardwareController hwCtrl; this doesnt work :)
+	HardwareController* hwCtrl; // this works ?? :)
+
+	//AppConfigController configCtrl; // file saving
 
 	// All System Information
-	SYSTEM_INFO sysInfo;
-	char CPUBrandString[length_cpuBrandStr];
+	SYSTEM_INFO sysInfo; // can probably return this and then display
 
-	std::atomic<bool> running = { true };
-	std::thread cpuThread;
-	PDH_HQUERY query;
+	/*std::atomic<bool> running = { true };
+	std::thread cpuThread;*/
+	/*PDH_HQUERY query;
 	PDH_HCOUNTER counter;
-	PDH_FMT_COUNTERVALUE counterVal;
+	PDH_FMT_COUNTERVALUE counterVal;*/
 	bool vsync;
 
 	// cpu vars
-	std::atomic<float> cpuValue = { 0.0 };
+	/*std::atomic<float> cpuValue = { 0.0 };
 	std::array<float, 10> cpuHistory {};
-	uint8_t index = 0;
+	uint8_t index = 0;*/
 
 	// processes
 	std::thread processThread;
@@ -54,18 +54,8 @@ private:
 
 public:
 	SystemMonitor();
-
-	// render ui to screen (make this a controller eventually
-	void RenderUi(); // name this to MainState
-
-	void renderCPU();
-	void renderRAM();
-	void renderProcesses();
-
-	// get system information (make this a controller eventually as well
-	void setThreadsForInfo();
-	void renderSysInfo();
-	void getCPUInfo();
+	void main(); // name this to MainState
+	//void setThreadsForInfo();
 	void getProcessesInfo();
 	bool setVsync();
 	void shutdown();

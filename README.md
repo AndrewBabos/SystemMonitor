@@ -91,12 +91,16 @@ Each process entry can later include CPU and memory statistics or be expanded in
 
 ```cpp
 // Example: start polling thread
-HardwareController hw;
-hw.start();
+HardwareController hwCtrl;
+
 
 // Render CPU + RAM
 UiController::renderCPU(hwCtrl->getCPUValue(), hwCtrl->getCPUHistory());
-UiController::renderRAM(hwCtrl->getRAMValue(), hwCtrl->getRAMHistory());
+UiController::renderSysInfo(hwCtrl->getCPUBrandStr(), hwCtrl->getSysInfo());
+UiController::renderRAM(hwCtrl->getRAMValue(),
+                        hwCtrl->getRAMHistory(),
+                        hwCtrl->getUsedRAM(),
+                        hwCtrl->getTotalPhysRAM());
 ```
 
 ---

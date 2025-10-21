@@ -21,8 +21,8 @@ It displays real-time CPU and RAM usage, along with detailed process information
 |------------|----------------|
 | `HardwareController` Class | Polls CPU, RAM, and system data through PDH and Win32 API |
 | `UiController` Namespace | Renders live ImGui + ImPlot visualizations |
-| `ProcessManager` | Enumerates and groups processes via `CreateToolhelp32Snapshot` |
-| Threads | Handle data sampling every 1 second to avoid blocking the render loop |
+[comment] "| `ProcessManager` | Enumerates and groups processes via `CreateToolhelp32Snapshot` |"
+| `Threads` | Handle data sampling every 1 second to avoid blocking the render loop |
 
 ---
 

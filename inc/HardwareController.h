@@ -62,6 +62,8 @@ private:
 	std::thread processThread;
 	HANDLE hSnap;
 	PROCESSENTRY32 pe;
+
+	// this is work in progress
 	//       exe : wstring, list of all same processes
 	std::map<std::wstring, std::vector<ProcessInfo>> processMap;
 	std::vector<ProcessInfo> processList{}; // legacy maybe

@@ -32,12 +32,11 @@ void HardwareController::getCPUInfo()
                 index = (index + 1) % cpuHistory.size();
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(thread_Update));
-                //std::this_thread::sleep_for(std::chrono::seconds(2)); // task manager update
+                //std::this_thread::sleep_for(std::chrono::seconds(2)); // task manager updates at this interval
             }
         }
     });
     SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
-
 }
 
 void HardwareController::setRAMInfo()
@@ -52,11 +51,10 @@ void HardwareController::setRAMInfo()
             {
                 DWORDLONG total = memInfo.ullTotalPhys;
                 DWORDLONG used = total - memInfo.ullAvailPhys;
-                float usedPercent = static_cast<float>((double)used / (double)total * 100.0);
                 ramUsed.store(static_cast<int>(used));
-                //totalPhysRAM.store(static_cast<int>((double)used / (double)total));
-                ramValue.store(usedPercent);
-                ramHistory[ramIndex] = usedPercent;
+                //totalPhysRAM.store(static_cast<int>((double)used / (double)total)); // might need
+                ramValue.store(static_cast<float>((double)used / (double)total * 100.0));
+                ramHistory[ramIndex] = static_cast<float>((double)used / (double)total * 100.0);
                 ramIndex = (ramIndex + 1) % ramHistory.size();
             }
             std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -109,7 +107,6 @@ const std::array<float, 10>& HardwareController::getCPUHistory() const
     return cpuHistory;
 }
 
-
 void HardwareController::getProcessesInfo()
 {
     if (hSnap == INVALID_HANDLE_VALUE)
@@ -124,7 +121,10 @@ void HardwareController::getProcessesInfo()
     {
         do
         {
-            // Process info: pe.th32ProcessID, pe.szExeFile, etc.
+            /*
+            * TODO:
+            *       fill out the rest of the struct for the process, still need CPU, RAM, NETWORK, AND GPU metrics
+            */
             processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f});
         } while (Process32Next(hSnap, &pe));
     }

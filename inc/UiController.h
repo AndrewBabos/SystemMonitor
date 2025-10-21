@@ -15,19 +15,6 @@
 //#include <Psapi.h>
 //#pragma comment(lib, "psapi.lib")
 
-//#define length_cpuBrandStr 0x40
-//struct ProcessInfo
-//{
-//	DWORD pid;
-//	std::wstring name;
-//	float cpuUsage;
-//	SIZE_T memoryUsage;
-//};
-//
-//// had to throw outside the namespace, cant use thread in non static
-//static std::vector<ProcessInfo> processList = {};
-//void fillProcessList(HANDLE& hSnap, PROCESSENTRY32& pe);
-
 
 namespace UiController
 {

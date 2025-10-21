@@ -34,29 +34,20 @@ private:
 
 	// All System Information
 	SYSTEM_INFO sysInfo; // can probably return this and then display
-
-	/*std::atomic<bool> running = { true };
-	std::thread cpuThread;*/
-	/*PDH_HQUERY query;
-	PDH_HCOUNTER counter;
-	PDH_FMT_COUNTERVALUE counterVal;*/
 	bool vsync;
 
-	// cpu vars
-	/*std::atomic<float> cpuValue = { 0.0 };
-	std::array<float, 10> cpuHistory {};
-	uint8_t index = 0;*/
-
+	/*
+		TODO:
+			Throw these into the hardware controller :3
+	*/
 	// processes
-	std::thread processThread;
 	HANDLE hSnap;
 	PROCESSENTRY32 pe;
 
 public:
 	SystemMonitor();
-	void main(); // name this to MainState
+	void main();
 	//void setThreadsForInfo();
-	void getProcessesInfo();
 	bool setVsync();
 	void shutdown();
 	~SystemMonitor();

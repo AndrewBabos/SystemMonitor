@@ -42,20 +42,43 @@ void HardwareController::getCPUInfo()
 
 void HardwareController::setRAMInfo()
 {
-    //MEMORYSTATUSEX memInfo;
-    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-    if (GlobalMemoryStatusEx(&memInfo))
+    ramThread = std::thread([this]()
     {
-        DWORDLONG totalPhys = memInfo.ullTotalPhys;
-        DWORDLONG usedPhys = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
-        std::cout << "Total RAM: " << totalPhys / (1024 * 1024) << " MB\n";
-        std::cout << "Used RAM: " << usedPhys / (1024 * 1024) << " MB\n";
+        while (ramRunning.load())
+        {
+            MEMORYSTATUSEX memInfo;
+            memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+            if (GlobalMemoryStatusEx(&memInfo))
+            {
+                DWORDLONG total = memInfo.ullTotalPhys;
+                DWORDLONG used = total - memInfo.ullAvailPhys;
+                float usedPercent = static_cast<float>((double)used / (double)total * 100.0);
+
+                ramValue.store(usedPercent);
+                ramHistory[ramIndex] = usedPercent;
+                ramIndex = (ramIndex + 1) % ramHistory.size();
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+        }
+    });
+    /*MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    if (GlobalMemoryStatusEx(&memInfo)) 
+    {
+        DWORDLONG total = memInfo.ullTotalPhys;
+        DWORDLONG used = total - memInfo.ullAvailPhys;
+        float usedPercent = static_cast<float>((double)used / (double)total * 100.0);
+
+        ramValue.store(usedPercent);
+        ramHistory[ramIndex] = usedPercent;
+        ramIndex = (ramIndex + 1) % ramHistory.size();
     }
+    std::this_thread::sleep_for(std::chrono::seconds(1));*/
 }
 
-MEMORYSTATUSEX HardwareController::getRAM()
+MEMORYSTATUSEX HardwareController::getRAM() const
 {
-    return MEMORYSTATUSEX();
+    return memInfo;
 }
 
 char* HardwareController::getCPUBrandStr()
@@ -123,4 +146,15 @@ void HardwareController::getProcessesInfo()
 std::vector<ProcessInfo> HardwareController::getProcessList()
 {
     return processList;
+}
+
+std::array<float, 10>& HardwareController::getRAMHistory()
+{
+    return ramHistory;
+}
+
+std::atomic<float>& HardwareController::getRAMValue()
+{
+    return ramValue;
+    // return ramValue.load();
 }

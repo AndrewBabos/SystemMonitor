@@ -51,6 +51,12 @@ private:
 	std::array<float, 10> cpuHistory{};
 	uint8_t index = 0;
 
+	/* 
+		TODO: make a ordered map
+		reduce the amount of processes that 
+		are duplicated or just have multiple 
+		for one app 
+	*/
 	// processes list
 	std::thread processThread;
 	HANDLE hSnap;
@@ -58,8 +64,12 @@ private:
 	std::vector<ProcessInfo> processList{};
 
 	// ram memory
+	std::thread ramThread;
 	MEMORYSTATUSEX memInfo;
-
+	std::atomic<bool> ramRunning{ true };
+	std::array<float, 10> ramHistory{};
+	std::atomic<float> ramValue;
+	uint8_t ramIndex = 0;
 	// glfw
 	bool vsync;
 
@@ -67,13 +77,14 @@ public:
 	HardwareController();
 	void getCPUInfo();
 	void setRAMInfo();
-	MEMORYSTATUSEX getRAM();
+	MEMORYSTATUSEX getRAM() const;
 	char* getCPUBrandStr();
 	SYSTEM_INFO& getSysInfo();
 	float getCPUValue() const;
 	const std::array<float, 10>& getCPUHistory() const;
 	void getProcessesInfo();
 	std::vector<ProcessInfo> getProcessList();
-
+	std::array<float, 10>& getRAMHistory();
+	std::atomic<float>& getRAMValue();
 };
 

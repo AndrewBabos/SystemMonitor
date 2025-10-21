@@ -136,9 +136,19 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, const std::arra
     ImGui::End();
 }
 
-void UiController::renderRAM()
+void UiController::renderRAM(const std::atomic<float>& ramValue, const std::array<float, 10>& ramHistory)
 {
-
+    ImGui::Begin("RAM");
+    ImGui::Text("RAM Usage: %.2f%%", ramValue.load());
+    if (ImPlot::BeginPlot("RAM Usage"))
+    {
+        ImPlot::SetupAxes("Intervals (Every 1s)", "Percent Used");
+        ImPlot::SetupAxisLimits(ImAxis_X1, 0, ramHistory.size(), ImGuiCond_Always);
+        ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
+        ImPlot::PlotLine("Usage", ramHistory.data(), ramHistory.size());
+        ImPlot::EndPlot();
+    }
+    ImGui::End();
 }
 
 void UiController::renderSysInfo(char CPUBrandString[length_cpuBrandStr], SYSTEM_INFO& sysInfo)
@@ -319,37 +329,7 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<
         }
         ImGui::EndTable();
 
-
         if (ImGui::Button("End Task"))
-        {
             std::cout << "ended task\n";
-        }
-        //// figure out how to get this out of the controller
-        //if (hSnap == INVALID_HANDLE_VALUE)
-        //{
-        //    std::cout << "ERROR GETTING stuff idk\n";
-        //    return;
-        //}
-
-        //// figure out how to move this out of the render namespace
-        //hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-        //pe.dwSize = sizeof(PROCESSENTRY32);
-        //if (Process32First(hSnap, &pe))
-        //{
-        //    do
-        //    {// Process info: pe.th32ProcessID, pe.szExeFile, etc.
-        //        ImGui::TableNextRow();
-        //        ImGui::TableSetColumnIndex(0);
-        //        ImGui::Text("%d", pe.th32ProcessID);
-        //        //ImGui::TableNextRow();
-        //        ImGui::TableSetColumnIndex(1);
-        //        ImGui::Text("%S", pe.szExeFile);
-        //        //ImGui::NextColumn();
-        //        //ImGui::Selectable((const char*)pe.szExeFile);
-        //    } while (Process32Next(hSnap, &pe));
-        //}
-
-
-        //ImGui::EndTable();
     }
 }

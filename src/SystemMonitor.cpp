@@ -23,7 +23,7 @@ void SystemMonitor::main()
     UiController::renderOptionsAndDockspace();
     UiController::renderCPU(hwCtrl->getCPUValue(), hwCtrl->getCPUHistory());
     UiController::renderSysInfo(hwCtrl->getCPUBrandStr(), hwCtrl->getSysInfo());
-    UiController::renderRAM(hwCtrl->getRAM());
+    UiController::renderRAM(hwCtrl->getRAMValue(), hwCtrl->getRAMHistory());
     // these 2 are the same
     //UiController::renderProcesses(hSnap, pe);
     //fillProcessList(hSnap, pe);

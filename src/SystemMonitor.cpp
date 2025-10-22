@@ -18,6 +18,7 @@ SystemMonitor::SystemMonitor()
 // all UiController method calls are put here to render
 void SystemMonitor::main()
 {
+    // these are all fine
     UiController::renderOptionsAndDockspace();
 
     UiController::renderCPU(hwCtrl->getCPUValue(),
@@ -28,9 +29,9 @@ void SystemMonitor::main()
                             hwCtrl->getRAMHistory(),
                             hwCtrl->getUsedRAM(),
                             hwCtrl->getTotalPhysRAM());
+
     // these 2 are the same
-    //UiController::renderProcesses(hSnap, pe);
-    UiController::testingTables(hSnap, pe, hwCtrl->getProcessList()); // prcesses tabole
+    UiController::renderProcessesTable(hSnap, pe, hwCtrl->getProcessList()); // prcesses tabole
 
     // references to their docs
     //ImGui::ShowDemoWindow();

@@ -107,8 +107,17 @@ const std::array<float, 10>& HardwareController::getCPUHistory() const
     return cpuHistory;
 }
 
+
+/*
+*   TODO:
+*       fill out the rest of the struct for the process, still need CPU, RAM, NETWORK, AND GPU metrics
+*       ALSO, make an alg that checks the map if a process is new, 
+*       if its not create a new entry in vector, 
+*       if it is add to the vector so a tree builds up
+*/
 void HardwareController::getProcessesInfo()
 {
+    // throw this into a thread to watch for any new processes added
     if (hSnap == INVALID_HANDLE_VALUE)
     {
         std::cout << "ERROR GETTING stuff idk\n";
@@ -119,16 +128,35 @@ void HardwareController::getProcessesInfo()
     pe.dwSize = sizeof(PROCESSENTRY32);
     if (Process32First(hSnap, &pe))
     {
+        /*
+        *   TODO:
+        *       fill out the rest of the struct for the process, still need CPU, RAM, NETWORK, AND GPU metrics
+        */
         do
         {
-            /*
-            * TODO:
-            *       fill out the rest of the struct for the process, still need CPU, RAM, NETWORK, AND GPU metrics
-            */
-            processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f});
+            // map stuff
+            ProcessInfo info{};
+            info.pid = pe.th32ProcessID;
+            info.name = pe.szExeFile;
+            processMap[info.name].push_back(info);
+
+            // legacy (vector)
+            //processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f});
         } while (Process32Next(hSnap, &pe));
     }
     CloseHandle(hSnap);
+
+    // take the name and how many processes (vector) out of the map iterator and use that
+    for (auto iterator = processMap.cbegin(); iterator != processMap.cend(); ++iterator)
+    {
+        const std::wstring& processName = iterator->first;
+        const std::vector<ProcessInfo>& processList = iterator->second;
+
+        // this displays the imaginary tree lol,
+        // if i have 3 chrome.exe, itll display here, if theres 1, still displays :p
+        for (const ProcessInfo& process : processList)
+            printf("PID: %lu ; Process name: %ls\n", process.pid, processName.c_str());
+    }
 }
 
 std::vector<ProcessInfo> HardwareController::getProcessList()

@@ -8,7 +8,7 @@
 #include <chrono>
 #include <array>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <pdh.h>
 #include <pdhmsg.h>
 #include <intrin.h>
@@ -53,7 +53,7 @@ private:
 	uint8_t index = 0;
 
 	/* 
-		TODO: make a ordered map
+		TODO: make a map
 		reduce the amount of processes that 
 		are duplicated or just have multiple 
 		for one app 
@@ -65,8 +65,10 @@ private:
 
 	// this is work in progress
 	//       exe : wstring, list of all same processes
-	std::map<std::wstring, std::vector<ProcessInfo>> processMap;
-	std::vector<ProcessInfo> processList{}; // legacy maybe
+	std::unordered_map<std::wstring, std::vector<ProcessInfo>> processMap;
+	
+	// legacy maybe
+	std::vector<ProcessInfo> processList{}; 
 
 	// ram memory
 	std::thread ramThread;
@@ -96,6 +98,5 @@ public:
 	std::atomic<float>& getRAMValue();
 	std::atomic<int>& getUsedRAM();
 	std::atomic<int>& getTotalPhysRAM();
-
 };
 

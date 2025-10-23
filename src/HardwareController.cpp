@@ -157,7 +157,10 @@ void HardwareController::getProcessesInfo()
         // this displays the imaginary tree lol,
         // if i have 3 chrome.exe, itll display here, if theres 1, still displays :p
         for (const ProcessInfo& process : processList)
+        {
             printf("PID: %lu ; Process name: %s\n", process.pid, processName.c_str());
+            //std::cout << processList.size() << std::endl;
+        }
     }
 }
 

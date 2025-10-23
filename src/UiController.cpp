@@ -239,77 +239,52 @@ void UiController::renderProcessesTable(HANDLE& hSnap, PROCESSENTRY32& pe, std::
 
 
         static int selectedIndex, index = -1;
-        ProcessInfo lastProcessViewed = { 12, "bruh", 0.0f }; // random thing
-        bool isSelected = false; // start on false
+        bool isSelected = false; // start on false, will be used eventually
         for (auto iterator = processMap.begin(); iterator != processMap.end(); ++iterator)
         {
             const std::string& processName = iterator->first; // might not need this
             const std::vector<ProcessInfo>& processList = iterator->second;
 
-
-           // ProcessInfo lastProcessViewed{};
-
-            for (const ProcessInfo currProcess : processList)
+            // if theres more than 1 process with the same exe name
+            if (processList.size() > 1)
             {
-                //lastProcessViewed = currProcess;
 
+                if (ImGui::TreeNodeEx(processName.c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
+                {
+                    for (const ProcessInfo& process : processList)
+                    {
+                        ImGui::TableNextRow();
+                        ImGui::TableSetColumnIndex(0);
+
+                        char pidStr[16];
+                        _ultoa_s(process.pid, pidStr, sizeof(pidStr), 10);
+                        ImGui::Text(pidStr);
+
+                        ImGui::TableSetColumnIndex(1);
+                        ImGui::Text("     %s", processName.c_str());
+                    }
+                    ImGui::TreePop();
+                }
+            }
+            else
+            {
+                const ProcessInfo& process = processList.front();
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
 
-                // windows conversion from DWORD to char array/string
                 char pidStr[16];
-                _ultoa_s(currProcess.pid, pidStr, sizeof(pidStr), 10);                
+                _ultoa_s(process.pid, pidStr, sizeof(pidStr), 10);
                 ImGui::Text(pidStr);
 
-                // next column
                 ImGui::TableSetColumnIndex(1);
-                if (currProcess.name == lastProcessViewed.name)
-                {
-                    // check if the process behind it is the same name, if so throw it in the tree
-                    if (ImGui::TreeNodeEx(processName.c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
-                    {
-                        //ImGui::PushID(currProcess.pid);
-                        ImGui::TableSetColumnIndex(1);
-                        if (ImGui::Selectable(currProcess.name.c_str(), isSelected, ImGuiSelectableFlags_SpanAllColumns))
-                            selectedIndex = index;
-                        //ImGui::Text("%ls", processName.c_str());
-                        //ImGui::PopID();
-                        ImGui::TreePop();
-                    }
-                }
-                else
-                {
-                    //lastProcessViewed = currProcess;
-                    ImGui::TableSetColumnIndex(1);
-                    ImGui::Text("%ls", currProcess.name.c_str());
-                    ImGui::TreePop();
-                    //lastProcessViewed = currProcess;
-                }
-                //ImGui::TreePop();
+                ImGui::Text("   %s", processName.c_str());
             }
         }
 
-        // old stuff
-        //static int selectedIndex = -1; // store currently selected row
-
-        //for (int i = 0; i < processMap.size(); i++)
-        //{
-        //    ImGui::TableNextRow();
-        //    ImGui::TableSetColumnIndex(0);
-
-        //    bool isSelected = (i == selectedIndex);
-
-        //    // little hack till i figure this out
-        //    char pidStr[16]; // enough for a 32-bit DWORD
-        //    sprintf_s(pidStr, "%u", processMap[i].pid);
-        //    if (ImGui::Selectable(pidStr, isSelected, ImGuiSelectableFlags_SpanAllColumns))
-        //        selectedIndex = i;
-
-        //    ImGui::TableSetColumnIndex(1);
-        //    ImGui::Text("%S", processList[i].name.c_str());
-        //}
-
         ImGui::EndTable();
+
+
+        // figure out this eventually
         if (ImGui::Button("End Task")) // debugging
             std::cout << "ended task\n";
     }

@@ -137,7 +137,9 @@ void HardwareController::getProcessesInfo()
             // map stuff
             ProcessInfo info{};
             info.pid = pe.th32ProcessID;
-            info.name = pe.szExeFile;
+            std::wstring widename = pe.szExeFile;
+            std::string name(widename.begin(), widename.end());
+            info.name = name;
             processMap[info.name].push_back(info);
 
             // legacy (vector)
@@ -149,19 +151,24 @@ void HardwareController::getProcessesInfo()
     // take the name and how many processes (vector) out of the map iterator and use that
     for (auto iterator = processMap.cbegin(); iterator != processMap.cend(); ++iterator)
     {
-        const std::wstring& processName = iterator->first;
+        const std::string& processName = iterator->first;
         const std::vector<ProcessInfo>& processList = iterator->second;
 
         // this displays the imaginary tree lol,
         // if i have 3 chrome.exe, itll display here, if theres 1, still displays :p
         for (const ProcessInfo& process : processList)
-            printf("PID: %lu ; Process name: %ls\n", process.pid, processName.c_str());
+            printf("PID: %lu ; Process name: %s\n", process.pid, processName.c_str());
     }
 }
 
-std::vector<ProcessInfo> HardwareController::getProcessList()
+//std::vector<ProcessInfo> HardwareController::getProcessList()
+//{
+//    return processList;
+//}
+
+std::unordered_map<std::string, std::vector<ProcessInfo>>& HardwareController::getProcessMap()
 {
-    return processList;
+    return processMap;
 }
 
 std::array<float, 10>& HardwareController::getRAMHistory()

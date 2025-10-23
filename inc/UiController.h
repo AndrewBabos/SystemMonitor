@@ -5,11 +5,13 @@
 #include <thread>
 #include <atomic>
 #include <array>
+#include <unordered_map>
 #include <vector>
 #include <Pdh.h>
 #include <windows.h>
 #include <TlHelp32.h>
 #include <pdhmsg.h>
+#include <codecvt>
 
 #include "HardwareController.h"
 //#include <Psapi.h>
@@ -33,6 +35,7 @@ namespace UiController
 	void renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe);
 	
 	// testing
-	void renderProcessesTable(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<ProcessInfo> processList);
+	//void renderProcessesTable(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<ProcessInfo> processList);
+	void renderProcessesTable(HANDLE& hSnap, PROCESSENTRY32& pe, const std::unordered_map<std::string, std::vector<ProcessInfo>> processMap);
 };
 

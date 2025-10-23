@@ -211,7 +211,7 @@ void UiController::renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe)
     //ImGui::End();
 }
 
-void UiController::renderProcessesTable(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<ProcessInfo> processList)
+void UiController::renderProcessesTable(HANDLE& hSnap, PROCESSENTRY32& pe, std::unordered_map<std::string, std::vector<ProcessInfo>> processMap)
 {
     ImGui::Begin("Processes");
     static ImGuiTableFlags flags =
@@ -234,49 +234,83 @@ void UiController::renderProcessesTable(HANDLE& hSnap, PROCESSENTRY32& pe, std::
         ImGui::TableSetupColumn("Memory");
         ImGui::TableSetupColumn("GPU");
         ImGui::TableSetupColumn("Network");
-        ImGui::TableSetupScrollFreeze(0, 1); // set always visible
+        //ImGui::TableSetupScrollFreeze(0, 1); // set always visible
         ImGui::TableHeadersRow();
 
-        if (ImGuiTableSortSpecs* sort_specs = ImGui::TableGetSortSpecs())
+
+        static int selectedIndex, index = -1;
+        ProcessInfo lastProcessViewed = { 12, "bruh", 0.0f }; // random thing
+        bool isSelected = false; // start on false
+        for (auto iterator = processMap.begin(); iterator != processMap.end(); ++iterator)
         {
-            if (sort_specs->SpecsDirty)
+            const std::string& processName = iterator->first; // might not need this
+            const std::vector<ProcessInfo>& processList = iterator->second;
+
+
+           // ProcessInfo lastProcessViewed{};
+
+            for (const ProcessInfo currProcess : processList)
             {
-                std::sort(processList.begin(), processList.end(),
-                    [sort_specs](const ProcessInfo& a, const ProcessInfo& b)
+                //lastProcessViewed = currProcess;
+
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+
+                // windows conversion from DWORD to char array/string
+                char pidStr[16];
+                _ultoa_s(currProcess.pid, pidStr, sizeof(pidStr), 10);                
+                ImGui::Text(pidStr);
+
+                // next column
+                ImGui::TableSetColumnIndex(1);
+                if (currProcess.name == lastProcessViewed.name)
+                {
+                    // check if the process behind it is the same name, if so throw it in the tree
+                    if (ImGui::TreeNodeEx(processName.c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
                     {
-                        for (int n = 0; n < sort_specs->SpecsCount; n++)
-                        {
-                            const ImGuiTableColumnSortSpecs* spec = &sort_specs->Specs[n];
-                            int result = (a.pid < b.pid) ? -1 : (a.pid > b.pid); // PID only
-                            if (result != 0)
-                                return spec->SortDirection == ImGuiSortDirection_Ascending ? result < 0 : result > 0;
-                        }
-                        return false;
-                    });
-                sort_specs->SpecsDirty = false;
+                        //ImGui::PushID(currProcess.pid);
+                        ImGui::TableSetColumnIndex(1);
+                        if (ImGui::Selectable(currProcess.name.c_str(), isSelected, ImGuiSelectableFlags_SpanAllColumns))
+                            selectedIndex = index;
+                        //ImGui::Text("%ls", processName.c_str());
+                        //ImGui::PopID();
+                        ImGui::TreePop();
+                    }
+                }
+                else
+                {
+                    //lastProcessViewed = currProcess;
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text("%ls", currProcess.name.c_str());
+                    ImGui::TreePop();
+                    //lastProcessViewed = currProcess;
+                }
+                //ImGui::TreePop();
             }
         }
-        static int selectedIndex = -1; // store currently selected row
 
-        for (int i = 0; i < processList.size(); i++)
-        {
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
+        // old stuff
+        //static int selectedIndex = -1; // store currently selected row
 
-            bool isSelected = (i == selectedIndex);
+        //for (int i = 0; i < processMap.size(); i++)
+        //{
+        //    ImGui::TableNextRow();
+        //    ImGui::TableSetColumnIndex(0);
 
-            // little hack till i figure this out
-            char pidStr[16]; // enough for a 32-bit DWORD
-            sprintf_s(pidStr, "%u", processList[i].pid);
-            if (ImGui::Selectable(pidStr, isSelected, ImGuiSelectableFlags_SpanAllColumns))
-                selectedIndex = i;
+        //    bool isSelected = (i == selectedIndex);
 
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%S", processList[i].name.c_str());
-        }
+        //    // little hack till i figure this out
+        //    char pidStr[16]; // enough for a 32-bit DWORD
+        //    sprintf_s(pidStr, "%u", processMap[i].pid);
+        //    if (ImGui::Selectable(pidStr, isSelected, ImGuiSelectableFlags_SpanAllColumns))
+        //        selectedIndex = i;
+
+        //    ImGui::TableSetColumnIndex(1);
+        //    ImGui::Text("%S", processList[i].name.c_str());
+        //}
+
         ImGui::EndTable();
-
-        if (ImGui::Button("End Task"))
+        if (ImGui::Button("End Task")) // debugging
             std::cout << "ended task\n";
     }
 }

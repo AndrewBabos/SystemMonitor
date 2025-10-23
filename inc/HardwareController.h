@@ -30,11 +30,11 @@ struct CPUInfo
 struct ProcessInfo
 {
 	DWORD pid;
-	std::wstring name;
+	std::string name;
 	float cpuUsage;
-	float memoryUsage;
-	float gpuUsage; // placerholder
-	float network; // placerholder
+	//float memoryUsage;
+	//float gpuUsage; // placerholder
+	//float network; // placerholder
 };
 
 class HardwareController
@@ -62,10 +62,8 @@ private:
 	std::thread processThread;
 	HANDLE hSnap;
 	PROCESSENTRY32 pe;
-
-	// this is work in progress
 	//       exe : wstring, list of all same processes
-	std::unordered_map<std::wstring, std::vector<ProcessInfo>> processMap;
+	std::unordered_map<std::string, std::vector<ProcessInfo>> processMap;
 	
 	// legacy maybe
 	std::vector<ProcessInfo> processList{}; 
@@ -93,7 +91,8 @@ public:
 	float getCPUValue() const;
 	const std::array<float, 10>& getCPUHistory() const;
 	void getProcessesInfo();
-	std::vector<ProcessInfo> getProcessList();
+	//std::vector<ProcessInfo> getProcessList();
+	std::unordered_map<std::string, std::vector<ProcessInfo>>& getProcessMap();
 	std::array<float, 10>& getRAMHistory();
 	std::atomic<float>& getRAMValue();
 	std::atomic<int>& getUsedRAM();

@@ -117,35 +117,50 @@ const std::array<float, 10>& HardwareController::getCPUHistory() const
 */
 void HardwareController::getProcessesInfo()
 {
-    // throw this into a thread to watch for any new processes added
+    // throw this into a thread to watch for any new processes added (eventuallpy)
     if (hSnap == INVALID_HANDLE_VALUE)
     {
         std::cout << "ERROR GETTING stuff idk\n";
         return;
     }
 
+    PDH_HQUERY processQueryStr{};
+    PDH_HCOUNTER processCounter{};
+    PDH_FMT_COUNTERVALUE cpuVal{};
+
+    //PROCESS_MEMORY_COUNTERS_EX processMem;
     hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     pe.dwSize = sizeof(PROCESSENTRY32);
     if (Process32First(hSnap, &pe))
     {
-        /*
-        *   TODO:
-        *       fill out the rest of the struct for the process, still need CPU, RAM, NETWORK, AND GPU metrics
-        */
         do
         {
             // map stuff
             ProcessInfo info{};
-            info.pid = pe.th32ProcessID;
             std::wstring widename = pe.szExeFile;
             std::string name(widename.begin(), widename.end());
+            std::string path = "\\Processor(" + name + ")\\% Processor Time";
+            PROCESS_MEMORY_COUNTERS_EX processMem{};
+            GetProcessMemoryInfo(hSnap, (PROCESS_MEMORY_COUNTERS*)&processMem, sizeof(processMem));
+            info.pid = pe.th32ProcessID;
             info.name = name;
+            info.memoryUsage = processMem.WorkingSetSize / (1024.0 * 1024.0);
+            std::cout << info.memoryUsage << std::endl;
+            /*PdhOpenQuery(nullptr, 0, &processQueryStr);
+            PdhAddCounterA(processQueryStr, path.c_str(), 0, &processCounter);
+            PdhCollectQueryData(processQueryStr);
+            PdhCloseQuery(query);
+
+            info.cpuUsage = cpuVal.doubleValue / std::thread::hardware_concurrency();
+            */
             processMap[info.name].push_back(info);
 
         } while (Process32Next(hSnap, &pe));
     }
     CloseHandle(hSnap);
+    //PdhCloseQuery(processQueryStr);
 
+    // print debugging
     // take the name and how many processes (vector) out of the map iterator and use that
     for (auto iterator = processMap.cbegin(); iterator != processMap.cend(); ++iterator)
     {
@@ -161,11 +176,6 @@ void HardwareController::getProcessesInfo()
         }
     }
 }
-
-//std::vector<ProcessInfo> HardwareController::getProcessList()
-//{
-//    return processList;
-//}
 
 std::unordered_map<std::string, std::vector<ProcessInfo>>& HardwareController::getProcessMap()
 {

@@ -26,29 +26,15 @@
 class SystemMonitor
 {
 private:
-	// for some reason this solves the crashing when getting cpu usage info
-	//HardwareController hwCtrl; this doesnt work :)
 	HardwareController* hwCtrl; // this works ?? :)
-
 	//AppConfigController configCtrl; // file saving
-
-	// All System Information
-	SYSTEM_INFO sysInfo; // can probably return this and then display
 	bool vsync;
-
-	/*
-		TODO:
-			Throw these into the hardware controller :3
-	*/
-	// processes
-	/*HANDLE hSnap;
-	PROCESSENTRY32 pe;*/
 
 public:
 	SystemMonitor();
 	void main();
 	//void setThreadsForInfo();
-	bool setVsync();
+	bool setVsync() const;
 	void shutdown();
 	~SystemMonitor();
 };

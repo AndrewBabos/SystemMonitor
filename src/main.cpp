@@ -71,7 +71,7 @@ int main()
 
     //SystemMonitor* p_sysMon = new SystemMonitor();
     SystemMonitor sysMon;
-    const double fpsTarget = 120.0;
+    const double fpsTarget = 60.0;
     const double frameTimeMS = 1000.0 / fpsTarget;
 
     // render loop

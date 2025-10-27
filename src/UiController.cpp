@@ -120,7 +120,8 @@ void UiController::renderOptionsAndDockspace()
     ImGui::End();
 }
 
-void UiController::renderCPU(const std::atomic<float>& cpuValue, const std::array<float, 10>& cpuHistory)
+void UiController::renderCPU(const std::atomic<float>& cpuValue,
+                             const std::array<float, 10>& cpuHistory)
 {
     ImGui::Begin("CPU");
     ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
@@ -144,7 +145,7 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
     ImGui::Begin("RAM");
     //std::cout << ramUsed.load() / (1024 * 1024) << std::endl;
     //ImGui::Text("%dMB installed", ramUsed.load());
-    //ImGui::Text("%dMB in use", totalPhysRAM.load());
+    ImGui::Text("%dMB in use", totalPhysRAM.load());
     ImGui::Text("RAM Usage: %.2f%%", ramValue.load());
     if (ImPlot::BeginPlot("RAM Usage"))
     {
@@ -201,7 +202,7 @@ void UiController::renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe)
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
                 ImGui::Text("%S", pe.szExeFile);
-                //ImGui::NextColumn();
+                ImGui::NextColumn();
                 //ImGui::Selectable((const char*)pe.szExeFile);
             } while (Process32Next(hSnap, &pe));
         }
@@ -248,7 +249,6 @@ void UiController::renderProcessesTable(HANDLE& hSnap, PROCESSENTRY32& pe, std::
             // if theres more than 1 process with the same exe name
             if (processList.size() > 1)
             {
-
                 if (ImGui::TreeNodeEx(processName.c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
                 {
                     for (const ProcessInfo& process : processList)
@@ -262,6 +262,12 @@ void UiController::renderProcessesTable(HANDLE& hSnap, PROCESSENTRY32& pe, std::
 
                         ImGui::TableSetColumnIndex(1);
                         ImGui::Text("     %s", processName.c_str());
+
+                        ImGui::TableSetColumnIndex(2);
+                        ImGui::Text("%d", process.cpuUsage);
+
+                        ImGui::TableSetColumnIndex(3);
+                        ImGui::Text("%zu", process.memoryUsage);
                     }
                     ImGui::TreePop();
                 }
@@ -278,6 +284,12 @@ void UiController::renderProcessesTable(HANDLE& hSnap, PROCESSENTRY32& pe, std::
 
                 ImGui::TableSetColumnIndex(1);
                 ImGui::Text("   %s", processName.c_str());
+
+                ImGui::TableSetColumnIndex(2);
+                ImGui::Text("%d", process.cpuUsage);
+
+                ImGui::TableSetColumnIndex(3);
+                ImGui::Text("%zu", process.memoryUsage);
             }
         }
 

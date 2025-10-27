@@ -4,11 +4,7 @@
 SystemMonitor::SystemMonitor()
 {
     hwCtrl = new HardwareController();
-    //vsync = false;
-
-    // list of processes
-   /* hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    pe.dwSize = sizeof(PROCESSENTRY32);*/
+    vsync = false;
 
     hwCtrl->getCPUInfo();
     hwCtrl->getProcessesInfo();
@@ -23,26 +19,28 @@ void SystemMonitor::main()
 
     UiController::renderCPU(hwCtrl->getCPUValue(),
                             hwCtrl->getCPUHistory());
-    UiController::renderSysInfo(hwCtrl->getCPUBrandStr(), 
-                                hwCtrl->getSysInfo());
+
+    UiController::renderSysInfo(
+                            hwCtrl->getCPUBrandStr(), 
+                            hwCtrl->getSysInfo());
+
     UiController::renderRAM(hwCtrl->getRAMValue(),
                             hwCtrl->getRAMHistory(),
                             hwCtrl->getUsedRAM(),
                             hwCtrl->getTotalPhysRAM());
 
-    // these 2 are the same
-    //UiController::renderProcessesTable(hSnap, pe, hwCtrl->getProcessMap()); // prcesses tabole
-    UiController::renderProcessesTable(hwCtrl->getSnapshotProcesses(),
-                                        hwCtrl->singleProcessStruct(),
-                                        hwCtrl->getProcessMap()); // prcesses tabole
+    UiController::renderProcessesTable(
+                            hwCtrl->getSnapshotProcesses(),
+                            hwCtrl->singleProcessStruct(),
+                            hwCtrl->getProcessMap());
 
     // references to their docs
-    ImGui::ShowDemoWindow();
+    //ImGui::ShowDemoWindow();
 
 	ImGui::End();
 }
 
-bool SystemMonitor::setVsync()
+bool SystemMonitor::setVsync() const
 {
     return !vsync;
 }

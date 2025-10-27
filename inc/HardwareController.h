@@ -23,8 +23,8 @@ struct CPUInfo
 {
 	uint8_t cores = 0;
 	uint8_t logicalCores = 0;
-	uint16_t baseClockMHz = 0;
-	uint16_t maxClockMHz = 0;
+	//uint16_t baseClockMHz = 0;
+	//uint16_t maxClockMHz = 0;
 };
 
 struct ProcessInfo
@@ -32,7 +32,7 @@ struct ProcessInfo
 	DWORD pid;
 	std::string name;
 	float cpuUsage;
-	//float memoryUsage;
+	SIZE_T memoryUsage;
 	//float gpuUsage; // placerholder
 	//float network; // placerholder
 };
@@ -92,7 +92,6 @@ public:
 	float getCPUValue() const;
 	const std::array<float, 10>& getCPUHistory() const;
 	void getProcessesInfo();
-	//std::vector<ProcessInfo> getProcessList();
 	std::unordered_map<std::string, std::vector<ProcessInfo>>& getProcessMap();
 	std::array<float, 10>& getRAMHistory();
 	std::atomic<float>& getRAMValue();

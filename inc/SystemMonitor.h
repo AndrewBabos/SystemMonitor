@@ -41,8 +41,8 @@ private:
 			Throw these into the hardware controller :3
 	*/
 	// processes
-	HANDLE hSnap;
-	PROCESSENTRY32 pe;
+	/*HANDLE hSnap;
+	PROCESSENTRY32 pe;*/
 
 public:
 	SystemMonitor();

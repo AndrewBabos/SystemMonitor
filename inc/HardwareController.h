@@ -62,6 +62,7 @@ private:
 	std::thread processThread;
 	HANDLE hSnap;
 	PROCESSENTRY32 pe;
+
 	//       exe : wstring, list of all same processes
 	std::unordered_map<std::string, std::vector<ProcessInfo>> processMap;
 	
@@ -97,5 +98,8 @@ public:
 	std::atomic<float>& getRAMValue();
 	std::atomic<int>& getUsedRAM();
 	std::atomic<int>& getTotalPhysRAM();
+
+	HANDLE& getSnapshotProcesses();
+	PROCESSENTRY32& singleProcessStruct();
 };
 

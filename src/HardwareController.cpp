@@ -142,8 +142,6 @@ void HardwareController::getProcessesInfo()
             info.name = name;
             processMap[info.name].push_back(info);
 
-            // legacy (vector)
-            //processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f});
         } while (Process32Next(hSnap, &pe));
     }
     CloseHandle(hSnap);
@@ -193,4 +191,14 @@ std::atomic<int>& HardwareController::getUsedRAM()
 std::atomic<int>& HardwareController::getTotalPhysRAM()
 {
     return totalPhysRAM;
+}
+
+HANDLE& HardwareController::getSnapshotProcesses()
+{
+    return hSnap;
+}
+
+PROCESSENTRY32& HardwareController::singleProcessStruct()
+{
+    return pe;
 }

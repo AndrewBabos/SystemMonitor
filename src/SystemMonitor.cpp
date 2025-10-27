@@ -4,11 +4,11 @@
 SystemMonitor::SystemMonitor()
 {
     hwCtrl = new HardwareController();
-    vsync = false;
+    //vsync = false;
 
     // list of processes
-    hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    pe.dwSize = sizeof(PROCESSENTRY32);
+   /* hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    pe.dwSize = sizeof(PROCESSENTRY32);*/
 
     hwCtrl->getCPUInfo();
     hwCtrl->getProcessesInfo();
@@ -31,7 +31,10 @@ void SystemMonitor::main()
                             hwCtrl->getTotalPhysRAM());
 
     // these 2 are the same
-    UiController::renderProcessesTable(hSnap, pe, hwCtrl->getProcessMap()); // prcesses tabole
+    //UiController::renderProcessesTable(hSnap, pe, hwCtrl->getProcessMap()); // prcesses tabole
+    UiController::renderProcessesTable(hwCtrl->getSnapshotProcesses(),
+                                        hwCtrl->singleProcessStruct(),
+                                        hwCtrl->getProcessMap()); // prcesses tabole
 
     // references to their docs
     ImGui::ShowDemoWindow();

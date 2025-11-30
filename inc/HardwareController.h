@@ -78,6 +78,9 @@ private:
 
 	uint8_t ramIndex = 0;
 
+	// convert to wstring
+	std::wstring wstringConvert(const char* word);
+
 	// glfw
 	bool vsync;
 
@@ -96,6 +99,5 @@ public:
 	std::atomic<float>& getRAMValue();
 	std::atomic<int>& getUsedRAM();
 	std::atomic<int>& getTotalPhysRAM();
-
 };
 

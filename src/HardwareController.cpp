@@ -139,7 +139,7 @@ void HardwareController::getProcessesInfo()
 }
 
 // testing
-std::wstring wstringConvert(const char* word)
+std::wstring HardwareController::wstringConvert(const char* word)
 {
     if (!word) return L"";
 

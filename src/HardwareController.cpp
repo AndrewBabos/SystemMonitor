@@ -15,7 +15,7 @@ void HardwareController::getCPUInfo()
 {
     if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
         return;
-    if (PdhAddCounter(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
+    if (PdhAddCounter(query, TEXT("\\Processor(_Total)\\% Processor Time"), 0, &counter) != ERROR_SUCCESS)
         return;
 
     //SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
@@ -125,7 +125,15 @@ void HardwareController::getProcessesInfo()
             * TODO:
             *       fill out the rest of the struct for the process, still need CPU, RAM, NETWORK, AND GPU metrics
             */
-            processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f});
+            processList.push_back(
+                { 
+                    pe.th32ProcessID, 
+                    std::string(pe.szExeFile), 
+                    0.0f, 
+                    0.0f, 
+                    0.0f, 
+                    0.0f
+                });
         } while (Process32Next(hSnap, &pe));
     }
     CloseHandle(hSnap);

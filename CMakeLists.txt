@@ -31,6 +31,10 @@ set(IMGUI_SOURCES
     ${IMGUI_DIR}/imgui_widgets.cpp
     ${IMGUI_DIR}/imgui_impl_glfw.cpp
     ${IMGUI_DIR}/imgui_impl_opengl3.cpp
+
+    ${IMGUI_DIR}/implot.cpp
+    ${IMGUI_DIR}/implot_items.cpp
+    #${IMGUI_DIR}/implot_demo.cpp
 )
 
 # -------- Your Code --------

@@ -1,6 +1,8 @@
 #include "../inc/HardwareController.h"
 #include <Psapi.h>
 
+std::wstring wstringConvert(const char* word);
+
 
 HardwareController::HardwareController()
 {
@@ -121,22 +123,36 @@ void HardwareController::getProcessesInfo()
     {
         do
         {
-            /*
-            * TODO:
-            *       fill out the rest of the struct for the process, still need CPU, RAM, NETWORK, AND GPU metrics
-            */
-            processList.push_back(
-                { 
-                    pe.th32ProcessID, 
-                    std::string(pe.szExeFile), 
-                    0.0f, 
-                    0.0f, 
-                    0.0f, 
-                    0.0f
-                });
+            ProcessInfo info{};
+            info.pid = pe.th32ProcessID;
+            //info.name = pe.szExeFile;   // wchar_t[] -> std::wstring
+            info.name = wstringConvert(pe.szExeFile);   // wchar_t[] -> std::wstring
+            info.cpuUsage = 0.0f;
+            info.memoryUsage = 0.0f;
+            info.gpuUsage = 0.0f;
+            info.network = 0.0f;
+
+            processList.push_back(info);
         } while (Process32Next(hSnap, &pe));
     }
     CloseHandle(hSnap);
+}
+
+// testing
+std::wstring wstringConvert(const char* word)
+{
+    if (!word) return L"";
+
+    int neededSize = MultiByteToWideChar(CP_UTF8, 0, word, -1, nullptr, 0);
+    if (neededSize <= 0) return L"";
+    std::wstring convertedWord(neededSize, 0);
+    MultiByteToWideChar(CP_UTF8, 0, word, -1, &convertedWord[0], neededSize);
+    
+    // remove the null-terminator '\0'
+    if (!convertedWord.empty() && convertedWord.back() == L'\0')
+        convertedWord.pop_back();
+
+    return convertedWord;
 }
 
 std::vector<ProcessInfo> HardwareController::getProcessList()

@@ -14,7 +14,7 @@
 #include <intrin.h>
 #include <algorithm>
 #include <TlHelp32.h>
-//#pragma comment(lib, "pdh.lib")
+#pragma comment(lib, "pdh.lib")
 
 #define thread_Update 450 // 0x1C2 (ms)
 #define length_cpuBrandStr 64 // 0x40 64 bytes length

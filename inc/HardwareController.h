@@ -14,6 +14,7 @@
 #include <intrin.h>
 #include <algorithm>
 #include <TlHelp32.h>
+#include <unordered_map>
 #pragma comment(lib, "pdh.lib")
 
 #define thread_Update 450 // 0x1C2 (ms)
@@ -30,7 +31,7 @@ struct CPUInfo
 struct ProcessInfo
 {
 	DWORD pid;
-	std::wstring name;
+	std::string name;
 	float cpuUsage;
 	float memoryUsage;
 	float gpuUsage; // placerholder
@@ -65,7 +66,7 @@ private:
 
 	// this is work in progress
 	//       exe : wstring, list of all same processes
-	std::map<std::wstring, std::vector<ProcessInfo>> processMap;
+	std::map<std::string, std::vector<ProcessInfo>> processMap;
 	std::vector<ProcessInfo> processList{}; // legacy maybe
 
 	// ram memory
@@ -95,6 +96,7 @@ public:
 	const std::array<float, 10>& getCPUHistory() const;
 	void getProcessesInfo();
 	std::vector<ProcessInfo> getProcessList();
+	std::map<std::string, std::vector<ProcessInfo>>& getProcessMap();
 	std::array<float, 10>& getRAMHistory();
 	std::atomic<float>& getRAMValue();
 	std::atomic<int>& getUsedRAM();

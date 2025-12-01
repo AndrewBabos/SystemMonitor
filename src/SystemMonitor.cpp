@@ -30,7 +30,8 @@ void SystemMonitor::main()
                             hwCtrl->getTotalPhysRAM());
     // these 2 are the same
     //UiController::renderProcesses(hSnap, pe);
-    UiController::testingTables(hSnap, pe, hwCtrl->getProcessList()); // prcesses tabole
+    //UiController::testingTables(hSnap, pe, hwCtrl->getProcessList()); // prcesses tabole with vector
+    UiController::testingTables(hSnap, pe, hwCtrl->getProcessMap()); // prcesses tabole with map
 
     // references to their docs
     //ImGui::ShowDemoWindow();

@@ -211,7 +211,8 @@ void UiController::renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe)
     //ImGui::End();
 }
 
-void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<ProcessInfo> processList)
+//void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<ProcessInfo> processList)
+void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::map<std::string, std::vector<ProcessInfo>> processMap)
 {
     ImGui::Begin("Processes");
     //getProcessesInfo();
@@ -220,11 +221,6 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<
         | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_NoBordersInBody
         | ImGuiTableFlags_ScrollY;
     const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
-
-    /*for (auto& process : processList)
-    {
-        std::cout << process.pid << std::endl;
-    }*/
 
     if (ImGui::BeginTable("ProcessesTable", 6, flags, ImVec2(0.0f, TEXT_BASE_HEIGHT * 15), 0.0f))
     {
@@ -237,43 +233,99 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<
         ImGui::TableSetupScrollFreeze(0, 1); // set always visible
         ImGui::TableHeadersRow();
 
-        if (ImGuiTableSortSpecs* sort_specs = ImGui::TableGetSortSpecs())
+        //if (ImGuiTableSortSpecs* sort_specs = ImGui::TableGetSortSpecs())
+        //{
+        //    if (sort_specs->SpecsDirty)
+        //    {
+        //        std::sort(processList.begin(), processList.end(),
+        //            [sort_specs](const ProcessInfo& a, const ProcessInfo& b)
+        //            {
+        //                for (int n = 0; n < sort_specs->SpecsCount; n++)
+        //                {
+        //                    const ImGuiTableColumnSortSpecs* spec = &sort_specs->Specs[n];
+        //                    int result = (a.pid < b.pid) ? -1 : (a.pid > b.pid); // PID only
+        //                    if (result != 0)
+        //                        return spec->SortDirection == ImGuiSortDirection_Ascending ? result < 0 : result > 0;
+        //                }
+        //                return false;
+        //            });
+        //        sort_specs->SpecsDirty = false;
+        //    }
+        //}
+        //static int selectedIndex = -1; // store currently selected row
+
+        //for (int i = 0; i < processList.size(); i++)
+        //{
+        //    ImGui::TableNextRow();
+        //    ImGui::TableSetColumnIndex(0);
+
+        //    bool isSelected = (i == selectedIndex);
+
+        //    // little hack till i figure this out
+        //    char pidStr[16]; // enough for a 32-bit DWORD
+        //    sprintf_s(pidStr, "%u", processList[i].pid);
+        //    if (ImGui::Selectable(pidStr, isSelected, ImGuiSelectableFlags_SpanAllColumns))
+        //        selectedIndex = i;
+
+        //    ImGui::TableSetColumnIndex(1);
+        //    ImGui::Text("%S", processList[i].name.c_str());
+        //}
+        //ImGui::EndTable();
+
+        static int selectedIndex, index = -1;
+        bool isSelected = false; // start on false, will be used eventually
+        for (auto iterator = processMap.begin(); iterator != processMap.end(); ++iterator)
         {
-            if (sort_specs->SpecsDirty)
+            const std::string& processName = iterator->first; // might not need this
+            const std::vector<ProcessInfo>& processList = iterator->second;
+
+            // if theres more than 1 process with the same exe name
+            if (processList.size() > 1)
             {
-                std::sort(processList.begin(), processList.end(),
-                    [sort_specs](const ProcessInfo& a, const ProcessInfo& b)
+                if (ImGui::TreeNodeEx(processName.c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
+                {
+                    for (const ProcessInfo& process : processList)
                     {
-                        for (int n = 0; n < sort_specs->SpecsCount; n++)
-                        {
-                            const ImGuiTableColumnSortSpecs* spec = &sort_specs->Specs[n];
-                            int result = (a.pid < b.pid) ? -1 : (a.pid > b.pid); // PID only
-                            if (result != 0)
-                                return spec->SortDirection == ImGuiSortDirection_Ascending ? result < 0 : result > 0;
-                        }
-                        return false;
-                    });
-                sort_specs->SpecsDirty = false;
+                        ImGui::TableNextRow();
+                        ImGui::TableSetColumnIndex(0);
+
+                        char pidStr[16];
+                        _ultoa_s(process.pid, pidStr, sizeof(pidStr), 10);
+                        ImGui::Text(pidStr);
+
+                        ImGui::TableSetColumnIndex(1);
+                        ImGui::Text("     %s", processName.c_str());
+
+                        ImGui::TableSetColumnIndex(2);
+                        ImGui::Text("%d", process.cpuUsage);
+
+                        ImGui::TableSetColumnIndex(3);
+                        ImGui::Text("%zu", process.memoryUsage);
+                    }
+                    ImGui::TreePop();
+                }
+            }
+            else
+            {
+                const ProcessInfo& process = processList.front();
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+
+                char pidStr[16];
+                _ultoa_s(process.pid, pidStr, sizeof(pidStr), 10);
+                ImGui::Text(pidStr);
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::Text("   %s", processName.c_str());
+
+                ImGui::TableSetColumnIndex(2);
+                ImGui::Text("%d", process.cpuUsage);
+
+                ImGui::TableSetColumnIndex(3);
+                ImGui::Text("%zu", process.memoryUsage);
             }
         }
-        static int selectedIndex = -1; // store currently selected row
 
-        for (int i = 0; i < processList.size(); i++)
-        {
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-
-            bool isSelected = (i == selectedIndex);
-
-            // little hack till i figure this out
-            char pidStr[16]; // enough for a 32-bit DWORD
-            sprintf_s(pidStr, "%u", processList[i].pid);
-            if (ImGui::Selectable(pidStr, isSelected, ImGuiSelectableFlags_SpanAllColumns))
-                selectedIndex = i;
-
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%S", processList[i].name.c_str());
-        }
         ImGui::EndTable();
 
         if (ImGui::Button("End Task"))

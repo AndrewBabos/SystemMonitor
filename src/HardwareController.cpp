@@ -126,13 +126,15 @@ void HardwareController::getProcessesInfo()
             ProcessInfo info{};
             info.pid = pe.th32ProcessID;
             //info.name = pe.szExeFile;   // wchar_t[] -> std::wstring
-            info.name = wstringConvert(pe.szExeFile);   // wchar_t[] -> std::wstring
+            //info.name = wstringConvert(pe.szExeFile);   // wchar_t[] -> std::wstring
+            info.name = pe.szExeFile;   // wchar_t[] -> std::wstring
             info.cpuUsage = 0.0f;
             info.memoryUsage = 0.0f;
             info.gpuUsage = 0.0f;
             info.network = 0.0f;
 
             processList.push_back(info);
+            processMap[info.name].push_back(info);
         } while (Process32Next(hSnap, &pe));
     }
     CloseHandle(hSnap);
@@ -158,6 +160,11 @@ std::wstring HardwareController::wstringConvert(const char* word)
 std::vector<ProcessInfo> HardwareController::getProcessList()
 {
     return processList;
+}
+
+std::map<std::string, std::vector<ProcessInfo>>& HardwareController::getProcessMap()
+{
+    return processMap;
 }
 
 std::array<float, 10>& HardwareController::getRAMHistory()

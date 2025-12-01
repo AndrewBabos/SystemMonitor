@@ -33,7 +33,7 @@ private:
 	//AppConfigController configCtrl; // file saving
 
 	// All System Information
-	SYSTEM_INFO sysInfo; // can probably return this and then display
+	//SYSTEM_INFO sysInfo; // can probably return this and then display
 	bool vsync;
 
 	/*

@@ -82,12 +82,14 @@ char* HardwareController::getCPUBrandStr()
         // Interpret CPU brand string
         switch (i)
         {
-            case (0x80000002):
+            case 0x80000002: 
                 memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-            case (0x80000003):
-                memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-            case (0x80000004):
+                break;
+            case 0x80000003: memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+                break;
+            case 0x80000004: 
                 memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+                break;
         }
     }
     return CPUBrandString;
@@ -127,7 +129,7 @@ void HardwareController::getProcessesInfo()
             info.pid = pe.th32ProcessID;
             //info.name = pe.szExeFile;   // wchar_t[] -> std::wstring
             //info.name = wstringConvert(pe.szExeFile);   // wchar_t[] -> std::wstring
-            info.name = pe.szExeFile;   // wchar_t[] -> std::wstring
+            info.name = pe.szExeFile;
             info.cpuUsage = 0.0f;
             info.memoryUsage = 0.0f;
             info.gpuUsage = 0.0f;

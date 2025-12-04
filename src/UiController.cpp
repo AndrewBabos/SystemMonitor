@@ -160,10 +160,10 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
     ImGui::End();
 }
 
-void UiController::renderSysInfo(char CPUBrandString[length_cpuBrandStr], SYSTEM_INFO& sysInfo)
+void UiController::renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInfo)
 {
     ImGui::Begin("System Information");
-    ImGui::Text("Processor:          %s", CPUBrandString);
+    ImGui::Text("Processor:          %s", CPUBrandString.c_str());
     ImGui::Text("Number of Cores:   %d", sysInfo.dwNumberOfProcessors);
     ImGui::Text("Processor Architecture:   %d", sysInfo.wProcessorArchitecture);
     ImGui::Separator();
@@ -287,6 +287,8 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::map<std
                 ImGui::TableSetColumnIndex(1);
                 if (ImGui::TreeNodeEx(processName.c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
                 {
+                    // take all the processes average CPU, RAM, GPU and NETWORK usage
+                    // and average it out
                     for (const ProcessInfo& process : processList)
                     {
                         ImGui::TableNextRow();

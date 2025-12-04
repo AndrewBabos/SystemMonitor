@@ -34,8 +34,8 @@ struct ProcessInfo
 	std::string name;
 	float cpuUsage;
 	float memoryUsage;
-	float gpuUsage; // placerholder
-	float networkUsage; // placerholder
+	float gpuUsage;
+	float networkUsage;
 };
 
 class HardwareController
@@ -53,33 +53,28 @@ private:
 	std::array<float, 10> cpuHistory{};
 	uint8_t index = 0;
 
-	/* 
-		TODO: make a ordered map
-		reduce the amount of processes that 
-		are duplicated or just have multiple 
-		for one app 
-	*/
+//	Mike Topp
+
 	// processes list
 	std::thread processThread;
 	HANDLE hSnap;
 	PROCESSENTRY32 pe;
 
-	// this is work in progress
-	//       exe : wstring, list of all same processes
+	std::thread processesThread;
 	std::map<std::string, std::vector<ProcessInfo>> processMap;
-	std::vector<ProcessInfo> processList{}; // legacy maybe
 
 	// ram memory
 	std::thread ramThread;
 	MEMORYSTATUSEX memInfo;
-	std::atomic<bool> ramRunning{ true };
+	std::atomic<bool> ramRunning{ true }; 
 	std::array<float, 10> ramHistory{};
 	std::atomic<float> ramValue; // percent
 	std::atomic<uint64_t> ramUsed, totalPhysRAM{0};
 
 	uint8_t ramIndex = 0;
 
-	// convert to wstring
+	// convert to wstring 
+	// pretty sure i dont need this
 	std::wstring wstringConvert(const char* word);
 
 	// glfw
@@ -90,12 +85,12 @@ public:
 	void getCPUInfo();
 	void setRAMInfo();
 	MEMORYSTATUSEX getRAM() const;
-	char* getCPUBrandStr();
+	std::string getCPUBrandStr();
 	SYSTEM_INFO& getSysInfo();
 	float getCPUValue() const;
 	const std::array<float, 10>& getCPUHistory() const;
 	void getProcessesInfo();
-	std::vector<ProcessInfo> getProcessList();
+	//std::vector<ProcessInfo> getProcessList();
 	std::map<std::string, std::vector<ProcessInfo>>& getProcessMap();
 	std::array<float, 10>& getRAMHistory();
 	std::atomic<float>& getRAMValue();

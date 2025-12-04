@@ -28,7 +28,7 @@ namespace UiController
 				   const std::atomic<uint64_t>& ramUsed,
 				   const std::atomic<uint64_t>& totalPhysRAM);
 	
-	void renderSysInfo(char CPUBrandString[length_cpuBrandStr], 
+	void renderSysInfo(std::string CPUBrandString, 
 		               SYSTEM_INFO& sysInfo);
 	void renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe);
 	

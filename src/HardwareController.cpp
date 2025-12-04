@@ -1,9 +1,6 @@
 #include "../inc/HardwareController.h"
 #include <Psapi.h>
 
-std::wstring wstringConvert(const char* word);
-
-
 HardwareController::HardwareController()
 {
     hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -11,7 +8,6 @@ HardwareController::HardwareController()
 	vsync = false;
 
 }
-
 
 void HardwareController::getCPUInfo()
 {
@@ -35,7 +31,6 @@ void HardwareController::getCPUInfo()
                 index = (index + 1) % cpuHistory.size();
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(thread_Update));
-                //std::this_thread::sleep_for(std::chrono::seconds(2)); // task manager updates at this interval
             }
         }
     });
@@ -74,9 +69,11 @@ MEMORYSTATUSEX HardwareController::getRAM() const
     return memInfo;
 }
 
-char* HardwareController::getCPUBrandStr()
+std::string HardwareController::getCPUBrandStr()
 {
-    char CPUBrandString[length_cpuBrandStr];
+    char CPUBrandString[length_cpuBrandStr] = "testing";
+    //char* str_CPU = (char*)malloc(sizeof(length_cpuBrandStr));;
+
     int CPUInfo[4] = {};
     unsigned nExIds, i = 0;
     __cpuid(CPUInfo, 0x80000000);
@@ -88,16 +85,21 @@ char* HardwareController::getCPUBrandStr()
         switch (i)
         {
             case 0x80000002: 
+                //memcpy(str_CPU, CPUInfo, sizeof(CPUInfo));
                 memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
                 break;
-            case 0x80000003: memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+            case 0x80000003: 
+                //memcpy(str_CPU + 16, CPUInfo, sizeof(CPUInfo));
+                memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
                 break;
             case 0x80000004: 
+                //memcpy(str_CPU + 32, CPUInfo, sizeof(CPUInfo));
                 memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
                 break;
         }
     }
-    return CPUBrandString;
+    //return str_CPU;
+    return std::string(CPUBrandString);
 }
 
 SYSTEM_INFO& HardwareController::getSysInfo()
@@ -124,26 +126,49 @@ void HardwareController::getProcessesInfo()
         return;
     }
 
-    hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    pe.dwSize = sizeof(PROCESSENTRY32);
-    if (Process32First(hSnap, &pe))
+    processesThread = std::thread([this]() 
     {
-        do
-        {
-            ProcessInfo info{};
-            info.pid = pe.th32ProcessID;
-            info.name = pe.szExeFile;      // const wchar_t* ? std::wstring OK
-            info.cpuUsage = 0.0f;
-            info.memoryUsage = 0.0f;
-            info.gpuUsage = 0.0f;
-            info.networkUsage = 0.0f;
+            hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+            pe.dwSize = sizeof(PROCESSENTRY32);
+            if (Process32First(hSnap, &pe))
+            {
+                do
+                {
+                    ProcessInfo info{};
+                    info.pid = pe.th32ProcessID;
+                    info.name = pe.szExeFile;      // const wchar_t* ? std::wstring OK
+                    info.cpuUsage = 0.0f;
+                    info.memoryUsage = 0.0f;
+                    info.gpuUsage = 0.0f;
+                    info.networkUsage = 0.0f;
 
-            //processList.push_back(info);
-            processMap[info.name].push_back(info);
-            //processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f });
-        } while (Process32Next(hSnap, &pe));
-    }
-    CloseHandle(hSnap);
+                    //processList.push_back(info);
+                    processMap[info.name].push_back(info);
+                    //processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f });
+                } while (Process32Next(hSnap, &pe));
+            }
+            CloseHandle(hSnap);
+    });
+    //hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    //pe.dwSize = sizeof(PROCESSENTRY32);
+    //if (Process32First(hSnap, &pe))
+    //{
+    //    do
+    //    {
+    //        ProcessInfo info{};
+    //        info.pid = pe.th32ProcessID;
+    //        info.name = pe.szExeFile;      // const wchar_t* ? std::wstring OK
+    //        info.cpuUsage = 0.0f;
+    //        info.memoryUsage = 0.0f;
+    //        info.gpuUsage = 0.0f;
+    //        info.networkUsage = 0.0f;
+
+    //        //processList.push_back(info);
+    //        processMap[info.name].push_back(info);
+    //        //processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f });
+    //    } while (Process32Next(hSnap, &pe));
+    //}
+    //CloseHandle(hSnap);
 }
 
 // testing
@@ -163,11 +188,6 @@ std::wstring HardwareController::wstringConvert(const char* word)
     return convertedWord;
 }
 
-std::vector<ProcessInfo> HardwareController::getProcessList()
-{
-    return processList;
-}
-
 std::map<std::string, std::vector<ProcessInfo>>& HardwareController::getProcessMap()
 {
     return processMap;
@@ -181,7 +201,6 @@ std::array<float, 10>& HardwareController::getRAMHistory()
 std::atomic<float>& HardwareController::getRAMValue()
 {
     return ramValue;
-    // return ramValue.load();
 }
 
 std::atomic<uint64_t>& HardwareController::getUsedRAM()

@@ -17,11 +17,8 @@ void HardwareController::getCPUInfo()
 {
     if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
         return;
-<<<<<<< Updated upstream
-    if (PdhAddCounter(query, TEXT("\\Processor(_Total)\\% Processor Time"), 0, &counter) != ERROR_SUCCESS)
-=======
+    //if (PdhAddCounter(query, TEXT("\\Processor(_Total)\\% Processor Time"), 0, &counter) != ERROR_SUCCESS)
     if (PdhAddCounterW(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
->>>>>>> Stashed changes
         return;
 
     //SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
@@ -133,32 +130,17 @@ void HardwareController::getProcessesInfo()
     {
         do
         {
-<<<<<<< Updated upstream
-            ProcessInfo info{};
-            info.pid = pe.th32ProcessID;
-            //info.name = pe.szExeFile;   // wchar_t[] -> std::wstring
-            //info.name = wstringConvert(pe.szExeFile);   // wchar_t[] -> std::wstring
-            info.name = pe.szExeFile;
-=======
-            /*
-            * TODO:
-            *       fill out the rest of the struct for the process, still need CPU, RAM, NETWORK, AND GPU metrics
-            */
             ProcessInfo info{};
             info.pid = pe.th32ProcessID;
             info.name = pe.szExeFile;      // const wchar_t* ? std::wstring OK
->>>>>>> Stashed changes
             info.cpuUsage = 0.0f;
             info.memoryUsage = 0.0f;
             info.gpuUsage = 0.0f;
-            info.network = 0.0f;
-<<<<<<< Updated upstream
+            info.networkUsage = 0.0f;
 
-            processList.push_back(info);
+            //processList.push_back(info);
             processMap[info.name].push_back(info);
-=======
-            processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f });
->>>>>>> Stashed changes
+            //processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f });
         } while (Process32Next(hSnap, &pe));
     }
     CloseHandle(hSnap);

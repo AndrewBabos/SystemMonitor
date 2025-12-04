@@ -141,15 +141,14 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
                              const std::atomic<uint64_t>& ramUsed,
                              const std::atomic<uint64_t>& totalPhysRAM)
 {
-    uint64_t totalBytes = totalPhysRAM.load(std::memory_order_relaxed);
-    uint64_t usedBytes = ramUsed.load(std::memory_order_relaxed);
+    /*uint64_t totalBytes = totalPhysRAM.load(std::memory_order_relaxed);
+    uint64_t usedBytes = ramUsed.load(std::memory_order_relaxed);*/
 
     ImGui::Begin("RAM");
-    /*ImGui::Text("%dMB installed", ramUsed.load());
-    ImGui::Text("%dMB in use", totalPhysRAM.load());
-    ImGui::Text("RAM Usage: %.2f%%", ramValue.load());*/
-    ImGui::Text("%.0fMB installed", (double)totalBytes / (1024 * 1024));
-    ImGui::Text("%.0fMB used", (double)usedBytes / (1024 * 1024));
+    //ImGui::Text("%.0fMB installed", (double)totalBytes / (1024 * 1024));
+    //ImGui::Text("%.0fMB used", (double)usedBytes / (1024 * 1024));
+    ImGui::Text("%.0fMB installed", (double) totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024));
+    ImGui::Text("%.0fMB used", (double) ramUsed.load(std::memory_order_relaxed) / (1024*1024));
     if (ImPlot::BeginPlot("RAM Usage"))
     {
         ImPlot::SetupAxes("Intervals (Every 3s)", "Percent Used");
@@ -179,13 +178,11 @@ void UiController::renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe)
     if (ImGui::BeginTable("SystemInfoTable", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
     {
         ImGui::TableSetupColumn("Process");
-        //ImGui::TableHeadersRow();
         ImGui::TableSetupColumn("CPU");
         ImGui::TableSetupColumn("Memory");
         ImGui::TableSetupColumn("GPU");
         ImGui::TableSetupColumn("Network");
         // This row is for processes
-        //ImGui::TableHeadersRow();
         ImGui::TableHeadersRow();
 
         // figure out how to get this out of the controller
@@ -286,6 +283,8 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::map<std
             // if theres more than 1 process with the same exe name
             if (processList.size() > 1)
             {
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(1);
                 if (ImGui::TreeNodeEx(processName.c_str(), ImGuiTreeNodeFlags_SpanFullWidth))
                 {
                     for (const ProcessInfo& process : processList)
@@ -305,6 +304,12 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::map<std
 
                         ImGui::TableSetColumnIndex(3);
                         ImGui::Text("%zu", process.memoryUsage);
+
+                        ImGui::TableSetColumnIndex(4);
+                        ImGui::Text("%d", process.gpuUsage);
+
+                        ImGui::TableSetColumnIndex(5);
+                        ImGui::Text("%d", process.networkUsage);
                     }
                     ImGui::TreePop();
                 }
@@ -327,6 +332,13 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::map<std
 
                 ImGui::TableSetColumnIndex(3);
                 ImGui::Text("%zu", process.memoryUsage);
+
+                ImGui::TableSetColumnIndex(4);
+                ImGui::Text("%zu", process.gpuUsage);
+                
+                ImGui::TableSetColumnIndex(5);
+                ImGui::Text("%zu", process.networkUsage);
+
             }
         }
 

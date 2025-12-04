@@ -75,7 +75,7 @@ private:
 	std::atomic<bool> ramRunning{ true };
 	std::array<float, 10> ramHistory{};
 	std::atomic<float> ramValue; // percent
-	std::atomic<int> ramUsed, totalPhysRAM;
+	std::atomic<uint64_t> ramUsed, totalPhysRAM;
 
 	uint8_t ramIndex = 0;
 
@@ -99,7 +99,13 @@ public:
 	std::map<std::string, std::vector<ProcessInfo>>& getProcessMap();
 	std::array<float, 10>& getRAMHistory();
 	std::atomic<float>& getRAMValue();
+<<<<<<< Updated upstream
 	std::atomic<int>& getUsedRAM();
 	std::atomic<int>& getTotalPhysRAM();
+=======
+	std::atomic<uint64_t>& getUsedRAM();
+	std::atomic<uint64_t>& getTotalPhysRAM();
+
+>>>>>>> Stashed changes
 };
 

@@ -25,8 +25,8 @@ namespace UiController
 
 	void renderRAM(const std::atomic<float>& ramValue,
 				   const std::array<float, 10>& ramHistory,
-				   const std::atomic<int>& ramUsed,
-				   const std::atomic<int>& totalPhysRAM);
+				   const std::atomic<uint64_t>& ramUsed,
+				   const std::atomic<uint64_t>& totalPhysRAM);
 	
 	void renderSysInfo(char CPUBrandString[length_cpuBrandStr], 
 		               SYSTEM_INFO& sysInfo);

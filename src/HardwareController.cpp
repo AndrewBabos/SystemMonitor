@@ -17,7 +17,11 @@ void HardwareController::getCPUInfo()
 {
     if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
         return;
+<<<<<<< Updated upstream
     if (PdhAddCounter(query, TEXT("\\Processor(_Total)\\% Processor Time"), 0, &counter) != ERROR_SUCCESS)
+=======
+    if (PdhAddCounterW(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
+>>>>>>> Stashed changes
         return;
 
     //SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
@@ -51,12 +55,16 @@ void HardwareController::setRAMInfo()
             memInfo.dwLength = sizeof(MEMORYSTATUSEX);
             if (GlobalMemoryStatusEx(&memInfo))
             {
-                DWORDLONG total = memInfo.ullTotalPhys;
-                DWORDLONG used = total - memInfo.ullAvailPhys;
-                ramUsed.store(static_cast<int>(used));
-                //totalPhysRAM.store(static_cast<int>((double)used / (double)total)); // might need
-                ramValue.store(static_cast<float>((double)used / (double)total * 100.0));
-                ramHistory[ramIndex] = static_cast<float>((double)used / (double)total * 100.0);
+                std::uint64_t total = static_cast<std::uint64_t>(memInfo.ullTotalPhys);
+                std::uint64_t used = total - static_cast<std::uint64_t>(memInfo.ullAvailPhys);
+
+                totalPhysRAM.store(total, std::memory_order_relaxed);
+                ramUsed.store(used, std::memory_order_relaxed);
+
+                float percent = static_cast<float>((double)used / (double)total * 100.0);
+                ramValue.store(percent, std::memory_order_relaxed);
+
+                ramHistory[ramIndex] = percent;
                 ramIndex = (ramIndex + 1) % ramHistory.size();
             }
             std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -125,18 +133,32 @@ void HardwareController::getProcessesInfo()
     {
         do
         {
+<<<<<<< Updated upstream
             ProcessInfo info{};
             info.pid = pe.th32ProcessID;
             //info.name = pe.szExeFile;   // wchar_t[] -> std::wstring
             //info.name = wstringConvert(pe.szExeFile);   // wchar_t[] -> std::wstring
             info.name = pe.szExeFile;
+=======
+            /*
+            * TODO:
+            *       fill out the rest of the struct for the process, still need CPU, RAM, NETWORK, AND GPU metrics
+            */
+            ProcessInfo info{};
+            info.pid = pe.th32ProcessID;
+            info.name = pe.szExeFile;      // const wchar_t* ? std::wstring OK
+>>>>>>> Stashed changes
             info.cpuUsage = 0.0f;
             info.memoryUsage = 0.0f;
             info.gpuUsage = 0.0f;
             info.network = 0.0f;
+<<<<<<< Updated upstream
 
             processList.push_back(info);
             processMap[info.name].push_back(info);
+=======
+            processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f });
+>>>>>>> Stashed changes
         } while (Process32Next(hSnap, &pe));
     }
     CloseHandle(hSnap);
@@ -180,12 +202,12 @@ std::atomic<float>& HardwareController::getRAMValue()
     // return ramValue.load();
 }
 
-std::atomic<int>& HardwareController::getUsedRAM()
+std::atomic<uint64_t>& HardwareController::getUsedRAM()
 {
     return ramUsed;
 }
 
-std::atomic<int>& HardwareController::getTotalPhysRAM()
+std::atomic<uint64_t>& HardwareController::getTotalPhysRAM()
 {
     return totalPhysRAM;
 }

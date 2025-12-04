@@ -138,14 +138,18 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, const std::arra
 
 void UiController::renderRAM(const std::atomic<float>& ramValue, 
                              const std::array<float, 10>& ramHistory, 
-                             const std::atomic<int>& ramUsed,
-                             const std::atomic<int>& totalPhysRAM)
+                             const std::atomic<uint64_t>& ramUsed,
+                             const std::atomic<uint64_t>& totalPhysRAM)
 {
+    uint64_t totalBytes = totalPhysRAM.load(std::memory_order_relaxed);
+    uint64_t usedBytes = ramUsed.load(std::memory_order_relaxed);
+
     ImGui::Begin("RAM");
-    //std::cout << ramUsed.load() / (1024 * 1024) << std::endl;
-    //ImGui::Text("%dMB installed", ramUsed.load());
-    //ImGui::Text("%dMB in use", totalPhysRAM.load());
-    ImGui::Text("RAM Usage: %.2f%%", ramValue.load());
+    /*ImGui::Text("%dMB installed", ramUsed.load());
+    ImGui::Text("%dMB in use", totalPhysRAM.load());
+    ImGui::Text("RAM Usage: %.2f%%", ramValue.load());*/
+    ImGui::Text("%.0fMB installed", (double)totalBytes / (1024 * 1024));
+    ImGui::Text("%.0fMB used", (double)usedBytes / (1024 * 1024));
     if (ImPlot::BeginPlot("RAM Usage"))
     {
         ImPlot::SetupAxes("Intervals (Every 3s)", "Percent Used");

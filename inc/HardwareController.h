@@ -20,13 +20,13 @@
 #define thread_Update 450 // 0x1C2 (ms)
 #define length_cpuBrandStr 64 // 0x40 64 bytes length
 
-struct CPUInfo
-{
-	uint8_t cores = 0;
-	uint8_t logicalCores = 0;
-	uint16_t baseClockMHz = 0;
-	uint16_t maxClockMHz = 0;
-};
+//struct CPUInfo
+//{
+//	uint8_t cores = 0;
+//	uint8_t logicalCores = 0;
+//	uint16_t baseClockMHz = 0;
+//	uint16_t maxClockMHz = 0;
+//};
 
 struct ProcessInfo
 {
@@ -82,20 +82,27 @@ private:
 
 public:
 	HardwareController();
+
+
+	// CpuMonitor class
 	void getCPUInfo();
-	void setRAMInfo();
-	MEMORYSTATUSEX getRAM() const;
 	std::string getCPUBrandStr();
-	SYSTEM_INFO& getSysInfo();
 	float getCPUValue() const;
 	const std::array<float, 10>& getCPUHistory() const;
-	void getProcessesInfo();
-	//std::vector<ProcessInfo> getProcessList();
-	std::map<std::string, std::vector<ProcessInfo>>& getProcessMap();
+
+	// RamMonitor class
+	void setRAMInfo();
+	MEMORYSTATUSEX getRAM() const;
 	std::array<float, 10>& getRAMHistory();
 	std::atomic<float>& getRAMValue();
 	std::atomic<uint64_t>& getUsedRAM();
 	std::atomic<uint64_t>& getTotalPhysRAM();
 
+	// ProcessesMonitor class
+	SYSTEM_INFO& getSysInfo();
+	void getProcessesInfo();
+	std::map<std::string, std::vector<ProcessInfo>>& getProcessMap();
+	
+	~HardwareController();
 };
 

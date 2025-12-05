@@ -213,7 +213,7 @@ void UiController::renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe)
 }
 
 //void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<ProcessInfo> processList)
-void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::map<std::string, std::vector<ProcessInfo>> processMap)
+void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap)
 {
     ImGui::Begin("Processes");
     //getProcessesInfo();

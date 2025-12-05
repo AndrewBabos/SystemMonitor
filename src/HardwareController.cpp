@@ -71,8 +71,7 @@ MEMORYSTATUSEX HardwareController::getRAM() const
 
 std::string HardwareController::getCPUBrandStr()
 {
-    char CPUBrandString[length_cpuBrandStr] = "testing";
-    //char* str_CPU = (char*)malloc(sizeof(length_cpuBrandStr));;
+    char CPUBrandString[length_cpuBrandStr] = "";
 
     int CPUInfo[4] = {};
     unsigned nExIds, i = 0;
@@ -85,20 +84,16 @@ std::string HardwareController::getCPUBrandStr()
         switch (i)
         {
             case 0x80000002: 
-                //memcpy(str_CPU, CPUInfo, sizeof(CPUInfo));
                 memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
                 break;
             case 0x80000003: 
-                //memcpy(str_CPU + 16, CPUInfo, sizeof(CPUInfo));
                 memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
                 break;
             case 0x80000004: 
-                //memcpy(str_CPU + 32, CPUInfo, sizeof(CPUInfo));
                 memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
                 break;
         }
     }
-    //return str_CPU;
     return std::string(CPUBrandString);
 }
 
@@ -149,26 +144,6 @@ void HardwareController::getProcessesInfo()
             }
             CloseHandle(hSnap);
     });
-    //hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    //pe.dwSize = sizeof(PROCESSENTRY32);
-    //if (Process32First(hSnap, &pe))
-    //{
-    //    do
-    //    {
-    //        ProcessInfo info{};
-    //        info.pid = pe.th32ProcessID;
-    //        info.name = pe.szExeFile;      // const wchar_t* ? std::wstring OK
-    //        info.cpuUsage = 0.0f;
-    //        info.memoryUsage = 0.0f;
-    //        info.gpuUsage = 0.0f;
-    //        info.networkUsage = 0.0f;
-
-    //        //processList.push_back(info);
-    //        processMap[info.name].push_back(info);
-    //        //processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f });
-    //    } while (Process32Next(hSnap, &pe));
-    //}
-    //CloseHandle(hSnap);
 }
 
 // testing
@@ -211,4 +186,17 @@ std::atomic<uint64_t>& HardwareController::getUsedRAM()
 std::atomic<uint64_t>& HardwareController::getTotalPhysRAM()
 {
     return totalPhysRAM;
+}
+
+HardwareController::~HardwareController()
+{
+    running.store(false);
+    PdhCloseQuery(query);
+    //CloseHandle(hSnap); 
+    
+    //if (cpuThread.joinable()) cpuThread.join();
+
+    //if (processesThread.joinable()) processesThread.join();
+
+    //if (ramThread.joinable()) ramThread.join();
 }

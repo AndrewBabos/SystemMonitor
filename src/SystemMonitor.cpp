@@ -3,7 +3,8 @@
 // all hardware getters and setters be placed here
 SystemMonitor::SystemMonitor()
 {
-    hwCtrl = new HardwareController();
+    //hwCtrl = new HardwareController();
+    hwCtrl = std::make_unique<HardwareController>();
     vsync = false;
 
     // list of processes
@@ -42,15 +43,12 @@ bool SystemMonitor::setVsync()
     return !vsync;
 }
 
-void SystemMonitor::shutdown()
-{
-}
+//void SystemMonitor::shutdown()
+//{
+//}
 
 SystemMonitor::~SystemMonitor()
 {
+    CloseHandle(hSnap);
     //delete hwCtrl; // dont know why this crashes, its literally freeing
-    /*running.store(false);
-    if (cpuThread.joinable()) 
-        cpuThread.join();*/
-    //PdhCloseQuery(query);
 }

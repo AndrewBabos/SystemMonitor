@@ -34,6 +34,6 @@ namespace UiController
 	
 	// still testing
 	//void testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<ProcessInfo> processList);
-	void testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::map<std::string, std::vector<ProcessInfo>> processMap);
+	void testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap);
 };
 

@@ -28,12 +28,12 @@ class SystemMonitor
 private:
 	// for some reason this solves the crashing when getting cpu usage info
 	//HardwareController hwCtrl; this doesnt work :)
-	HardwareController* hwCtrl; // this works ?? :)
+	//HardwareController* hwCtrl; // this works ?? :)
+	std::unique_ptr<HardwareController> hwCtrl;
 
+	// idk why i put this here maybe itll come back to me
 	//AppConfigController configCtrl; // file saving
 
-	// All System Information
-	//SYSTEM_INFO sysInfo; // can probably return this and then display
 	bool vsync;
 
 	/*
@@ -47,8 +47,7 @@ private:
 public:
 	SystemMonitor();
 	void main();
-	//void setThreadsForInfo();
 	bool setVsync();
-	void shutdown();
+	//void shutdown();
 	~SystemMonitor();
 };

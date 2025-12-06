@@ -48,6 +48,7 @@ public:
 	SystemMonitor();
 	void main();
 	bool setVsync();
-	//void shutdown();
+	const HANDLE& getHandle() const;
+	const PROCESSENTRY32& getProcessEntry() const;
 	~SystemMonitor();
 };

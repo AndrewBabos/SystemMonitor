@@ -28,9 +28,7 @@ void SystemMonitor::main()
                             hwCtrl->getRAMHistory(),
                             hwCtrl->getUsedRAM(),
                             hwCtrl->getTotalPhysRAM());
-
-    //UiController::testingTables(hSnap, pe, hwCtrl->getProcessList()); // prcesses tabole with vector
-    UiController::testingTables(hSnap, pe, hwCtrl->getProcessMap()); // prcesses tabole with map
+    UiController::renderProcesses(getHandle(), getProcessEntry(), hwCtrl->getProcessMap());
 
     // references to their docs
     //ImGui::ShowDemoWindow();
@@ -41,6 +39,16 @@ void SystemMonitor::main()
 bool SystemMonitor::setVsync()
 {
     return !vsync;
+}
+
+const HANDLE& SystemMonitor::getHandle() const
+{
+    return hSnap;
+}
+
+const PROCESSENTRY32& SystemMonitor::getProcessEntry() const
+{
+    return pe;
 }
 
 //void SystemMonitor::shutdown()

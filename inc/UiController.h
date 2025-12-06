@@ -30,10 +30,8 @@ namespace UiController
 	
 	void renderSysInfo(std::string CPUBrandString, 
 		               SYSTEM_INFO& sysInfo);
-	void renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe);
+
+	void renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap);
 	
-	// still testing
-	//void testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<ProcessInfo> processList);
-	void testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap);
 };
 

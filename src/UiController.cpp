@@ -170,50 +170,7 @@ void UiController::renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInf
     ImGui::End();
 }
 
-void UiController::renderProcesses(HANDLE& hSnap, PROCESSENTRY32& pe)
-{
-    ImGui::Begin("Processes");
-    //getProcessesInfo();
-
-    if (ImGui::BeginTable("SystemInfoTable", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
-    {
-        ImGui::TableSetupColumn("Process");
-        ImGui::TableSetupColumn("CPU");
-        ImGui::TableSetupColumn("Memory");
-        ImGui::TableSetupColumn("GPU");
-        ImGui::TableSetupColumn("Network");
-        // This row is for processes
-        ImGui::TableHeadersRow();
-
-        // figure out how to get this out of the controller
-        if (hSnap == INVALID_HANDLE_VALUE)
-        {
-            std::cout << "ERROR GETTING stuff idk\n";
-            return;
-        }
-
-        // figure out how to move this out of the render namespace
-        hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-        pe.dwSize = sizeof(PROCESSENTRY32);
-        if (Process32First(hSnap, &pe))
-        {
-            do
-            {// Process info: pe.th32ProcessID, pe.szExeFile, etc.
-                ImGui::TableNextRow();
-                ImGui::TableSetColumnIndex(0);
-                ImGui::Text("%S", pe.szExeFile);
-                //ImGui::NextColumn();
-                //ImGui::Selectable((const char*)pe.szExeFile);
-            } while (Process32Next(hSnap, &pe));
-        }
-
-        ImGui::EndTable();
-    }
-    //ImGui::End();
-}
-
-//void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, std::vector<ProcessInfo> processList)
-void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap)
+void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap)
 {
     ImGui::Begin("Processes");
     //getProcessesInfo();
@@ -233,45 +190,6 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, const std::m
         ImGui::TableSetupColumn("Network");
         ImGui::TableSetupScrollFreeze(0, 1); // set always visible
         ImGui::TableHeadersRow();
-
-        //if (ImGuiTableSortSpecs* sort_specs = ImGui::TableGetSortSpecs())
-        //{
-        //    if (sort_specs->SpecsDirty)
-        //    {
-        //        std::sort(processList.begin(), processList.end(),
-        //            [sort_specs](const ProcessInfo& a, const ProcessInfo& b)
-        //            {
-        //                for (int n = 0; n < sort_specs->SpecsCount; n++)
-        //                {
-        //                    const ImGuiTableColumnSortSpecs* spec = &sort_specs->Specs[n];
-        //                    int result = (a.pid < b.pid) ? -1 : (a.pid > b.pid); // PID only
-        //                    if (result != 0)
-        //                        return spec->SortDirection == ImGuiSortDirection_Ascending ? result < 0 : result > 0;
-        //                }
-        //                return false;
-        //            });
-        //        sort_specs->SpecsDirty = false;
-        //    }
-        //}
-        //static int selectedIndex = -1; // store currently selected row
-
-        //for (int i = 0; i < processList.size(); i++)
-        //{
-        //    ImGui::TableNextRow();
-        //    ImGui::TableSetColumnIndex(0);
-
-        //    bool isSelected = (i == selectedIndex);
-
-        //    // little hack till i figure this out
-        //    char pidStr[16]; // enough for a 32-bit DWORD
-        //    sprintf_s(pidStr, "%u", processList[i].pid);
-        //    if (ImGui::Selectable(pidStr, isSelected, ImGuiSelectableFlags_SpanAllColumns))
-        //        selectedIndex = i;
-
-        //    ImGui::TableSetColumnIndex(1);
-        //    ImGui::Text("%S", processList[i].name.c_str());
-        //}
-        //ImGui::EndTable();
 
         static int selectedIndex, index = -1;
         bool isSelected = false; // start on false, will be used eventually
@@ -337,7 +255,7 @@ void UiController::testingTables(HANDLE& hSnap, PROCESSENTRY32& pe, const std::m
 
                 ImGui::TableSetColumnIndex(4);
                 ImGui::Text("%zu", process.gpuUsage);
-                
+
                 ImGui::TableSetColumnIndex(5);
                 ImGui::Text("%zu", process.networkUsage);
 

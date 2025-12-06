@@ -28,7 +28,7 @@
 [Rr]elease*/
 [xX]64/
 [xX]86/
-[Bb]uild/
+#[Bb]uild/
 [Oo]ut/
 *.vs/
 .vs/

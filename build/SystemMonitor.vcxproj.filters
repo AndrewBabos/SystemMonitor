@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\src\HardwareController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\src\SystemMonitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\src\UiController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\imgui\imgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\imgui\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\imgui\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\imgui\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\imgui\imgui_impl_glfw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\imgui\implot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\imgui\implot_items.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\inc\HardwareController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\inc\SystemMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\inc\UiController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\andre\OneDrive\Documents\GitHub\SystemMonitor\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{B9DBC8FF-1D3A-309B-AB48-B0C1A2B7C435}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{97824C62-EF6B-3C40-A5F8-2B690F96A5D6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

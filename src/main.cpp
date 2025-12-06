@@ -10,7 +10,7 @@
 #include "../inc/SystemMonitor.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+//void processInput(GLFWwindow* window);
 
 // settings
 const unsigned int SCR_WIDTH = 1200;
@@ -88,7 +88,7 @@ int main()
 
         // my code
         //p_sysMon->RenderUi();
-        sysMon.main();
+        sysMon.render();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -109,7 +109,7 @@ int main()
         if (elapsedTime.count() < frameTimeMS)
             std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(frameTimeMS - elapsedTime.count()));
 
-        processInput(window);
+        //processInput(window);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -125,11 +125,11 @@ int main()
     return 0;
 }
 
-void processInput(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
+//void processInput(GLFWwindow* window)
+//{
+//    /*if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+//        glfwSetWindowShouldClose(window, true);*/
+//}
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)

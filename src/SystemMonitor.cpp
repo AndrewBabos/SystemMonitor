@@ -17,18 +17,22 @@ SystemMonitor::SystemMonitor()
 }
 
 // all UiController method calls are put here to render
-void SystemMonitor::main()
+void SystemMonitor::render()
 {
     UiController::renderOptionsAndDockspace();
-    UiController::renderCPU(hwCtrl->getCPUValue(),
-                            hwCtrl->getCPUHistory());
-    UiController::renderSysInfo(hwCtrl->getCPUBrandStr(), 
-                                hwCtrl->getSysInfo());
-    UiController::renderRAM(hwCtrl->getRAMValue(),
-                            hwCtrl->getRAMHistory(),
-                            hwCtrl->getUsedRAM(),
-                            hwCtrl->getTotalPhysRAM());
-    UiController::renderProcesses(getHandle(), getProcessEntry(), hwCtrl->getProcessMap());
+
+
+    UiController::renderCPU(        hwCtrl->getCPUValue(),
+                                    hwCtrl->getCPUHistory());
+    UiController::renderSysInfo(    hwCtrl->getCPUBrandStr(), 
+                                    hwCtrl->getSysInfo());
+    UiController::renderRAM(        hwCtrl->getRAMValue(),
+                                    hwCtrl->getRAMHistory(),
+                                    hwCtrl->getUsedRAM(),
+                                    hwCtrl->getTotalPhysRAM());
+    UiController::renderProcesses(  getHandle(), 
+                                    getProcessEntry(), 
+                                    hwCtrl->getProcessMap());
 
     // references to their docs
     //ImGui::ShowDemoWindow();
@@ -51,12 +55,10 @@ const PROCESSENTRY32& SystemMonitor::getProcessEntry() const
     return pe;
 }
 
-//void SystemMonitor::shutdown()
-//{
-//}
-
 SystemMonitor::~SystemMonitor()
 {
     CloseHandle(hSnap);
-    //delete hwCtrl; // dont know why this crashes, its literally freeing
+    // pretty sure trying to stop a thread makes it crash
+    // its a unique pointer so no need for delete
+    //delete hwCtrl; // dont know why this crashes
 }

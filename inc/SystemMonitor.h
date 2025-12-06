@@ -46,7 +46,7 @@ private:
 
 public:
 	SystemMonitor();
-	void main();
+	void render();
 	bool setVsync();
 	const HANDLE& getHandle() const;
 	const PROCESSENTRY32& getProcessEntry() const;

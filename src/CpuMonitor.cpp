@@ -2,15 +2,63 @@
 
 CpuMonitor::CpuMonitor()
 {
+	running.store(false);
 }
 
 void CpuMonitor::pollCPUMetrics()
 {
+    if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
+        return;
+    //if (PdhAddCounter(query, TEXT("\\Processor(_Total)\\% Processor Time"), 0, &counter) != ERROR_SUCCESS)
+    if (PdhAddCounterW(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
+        return;
+
+    cpuThread = std::thread([this]()
+        {
+            while (running.load())
+            {
+                PdhCollectQueryData(query);
+                PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
+                cpuValue.store(counterVal.doubleValue);
+                if (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal) == ERROR_SUCCESS)
+                {
+                    cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
+                    index = (index + 1) % cpuHistory.size();
+
+                    std::this_thread::sleep_for(std::chrono::milliseconds(450));
+                }
+            }
+        });
+    SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
+    cpuThread.join();
 }
 
 const std::string CpuMonitor::getCPUStr() const
 {
-	return std::string();
+    char CPUBrandString[64] = "";
+
+    int CPUInfo[4] = {};
+    unsigned nExIds, i = 0;
+    __cpuid(CPUInfo, 0x80000000);
+    nExIds = CPUInfo[0];
+    for (i = 0x80000000; i <= nExIds; ++i)
+    {
+        __cpuid(CPUInfo, i);
+        // Interpret CPU brand string
+        switch (i)
+        {
+        case 0x80000002:
+            memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+            break;
+        case 0x80000003:
+            memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+            break;
+        case 0x80000004:
+            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+            break;
+        }
+    }
+    return std::string(CPUBrandString);
 }
 
 const std::array<float, 10>& CpuMonitor::getCPUMetrics() const
@@ -20,4 +68,7 @@ const std::array<float, 10>& CpuMonitor::getCPUMetrics() const
 
 CpuMonitor::~CpuMonitor()
 {
+    // delete anything here
+    if (cpuThread.joinable())
+        cpuThread.join();
 }

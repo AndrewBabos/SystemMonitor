@@ -237,15 +237,15 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
             else
             {
                 const ProcessInfo& process = processList.front();
+                char pidStr[12];
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-
-                char pidStr[16];
                 _ultoa_s(process.pid, pidStr, sizeof(pidStr), 10);
                 ImGui::Text(pidStr);
 
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("   %s", processName.c_str());
+                //ImGui::Text("   %s", processName.c_str());
+                ImGui::Text("%s", processName.c_str());
 
                 ImGui::TableSetColumnIndex(2);
                 ImGui::Text("%d", process.cpuUsage);

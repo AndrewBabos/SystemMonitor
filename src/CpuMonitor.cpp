@@ -2,7 +2,7 @@
 
 CpuMonitor::CpuMonitor()
 {
-	running.store(false);
+	//running.store(false); // thread wasnt being used
     /*query = {};
     counter = {};
     counterVal = {};*/
@@ -16,32 +16,28 @@ void CpuMonitor::pollCPUMetrics()
         return;
     }
     if (PdhAddCounterW(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
-    {
-        running.store(false);
-        PdhCloseQuery(query);
-        return;
-    }
-
+     {
+         running.store(false);
+         PdhCloseQuery(query);
+         return;
+     }
     cpuThread = std::thread([this]()
+    {
+        while (running.load())
         {
-            while (running.load())
+            PdhCollectQueryData(query);
+            PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
+            cpuValue.store(counterVal.doubleValue);
+            if (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal) == ERROR_SUCCESS)
             {
-                //PdhCollectQueryData(query);
-                //PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
-                if (PdhCollectQueryData(query) != ERROR_SUCCESS)
-                    continue;
-                if (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal) == ERROR_SUCCESS)
-                {
-                    cpuValue.store(static_cast<float>(counterVal.doubleValue));
-                    cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
-                    index = (index + 1) % cpuHistory.size();
+                cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
+                index = (index + 1) % cpuHistory.size();
 
-                }
                 std::this_thread::sleep_for(std::chrono::milliseconds(450));
             }
-        });
+        }
+    });
     SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
-    //cpuThread.join();
 }
 
 const std::string CpuMonitor::getCPUStr() const

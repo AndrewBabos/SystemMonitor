@@ -108,14 +108,12 @@ SYSTEM_INFO& HardwareController::getSysInfo()
 float HardwareController::getCPUValue() const
 {
     //return cpuValue;
-    std::cout << "getCPUValue returned" << std::endl;
     return cpuMonitor.getCPUValue();
 }
 
 const std::array<float, 10>& HardwareController::getCPUHistory() const
 {
     //return cpuHistory;
-    std::cout << "getCPUMetrics returned array" << std::endl;
     return cpuMonitor.getCPUMetrics();
 }
 

@@ -40,6 +40,22 @@ void CpuMonitor::pollCPUMetrics()
     SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
 }
 
+void CpuMonitor::stopPolling()
+{
+    if (!running.exchange(false))
+        return;
+
+    if (cpuThread.joinable())
+        cpuThread.join();
+
+    if (query != nullptr)
+    {
+        PdhCloseQuery(query);
+        query = nullptr;
+        counter = nullptr;
+    }
+}
+
 const std::string CpuMonitor::getCPUStr() const
 {
     char CPUBrandString[64] = "";
@@ -78,25 +94,9 @@ const std::array<float, 10>& CpuMonitor::getCPUMetrics() const
 	return cpuHistory;
 }
 
-void CpuMonitor::stopPolling()
-{
-    if (!running.exchange(false))
-        return;
-
-    if (cpuThread.joinable())
-        cpuThread.join();
-
-    if (query != nullptr)
-    {
-        PdhCloseQuery(query);
-        query = nullptr;
-        counter = nullptr;
-    }
-}
-
 CpuMonitor::~CpuMonitor()
 {
-    // delete anything here
+    // pretty sure this stops it?
     if (cpuThread.joinable())
         cpuThread.join();
 }

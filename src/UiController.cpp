@@ -159,6 +159,12 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
     ImGui::End();
 }
 
+void UiController::renderGPU()
+{
+    ImGui::Begin("GPU");
+    ImGui::End();
+}
+
 void UiController::renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInfo)
 {
     ImGui::Begin("System Information");

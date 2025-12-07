@@ -33,10 +33,9 @@ private:
 public:
 	CpuMonitor();
 	void pollCPUMetrics();
+	void stopPolling();
 	const std::string getCPUStr() const;
 	const std::atomic<float>& getCPUValue() const;
 	const std::array<float, 10>& getCPUMetrics() const;
-	void stopPolling();
 	~CpuMonitor();
-
 };

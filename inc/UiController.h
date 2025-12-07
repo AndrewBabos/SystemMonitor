@@ -27,8 +27,10 @@ namespace UiController
 				   const std::array<float, 10>& ramHistory,
 				   const std::atomic<uint64_t>& ramUsed,
 				   const std::atomic<uint64_t>& totalPhysRAM);
+
+	void renderGPU();
 	
-	void renderSysInfo(std::string CPUBrandString, 
+	void renderSysInfo(std::string CPUBrandString,
 		               SYSTEM_INFO& sysInfo);
 
 	void renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap);

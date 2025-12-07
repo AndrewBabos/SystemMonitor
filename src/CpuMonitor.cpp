@@ -3,34 +3,45 @@
 CpuMonitor::CpuMonitor()
 {
 	running.store(false);
+    /*query = {};
+    counter = {};
+    counterVal = {};*/
 }
 
 void CpuMonitor::pollCPUMetrics()
 {
     if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
+    {
+        running.store(false);
         return;
-    //if (PdhAddCounter(query, TEXT("\\Processor(_Total)\\% Processor Time"), 0, &counter) != ERROR_SUCCESS)
+    }
     if (PdhAddCounterW(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
+    {
+        running.store(false);
+        PdhCloseQuery(query);
         return;
+    }
 
     cpuThread = std::thread([this]()
         {
             while (running.load())
             {
-                PdhCollectQueryData(query);
-                PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
-                cpuValue.store(counterVal.doubleValue);
+                //PdhCollectQueryData(query);
+                //PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
+                if (PdhCollectQueryData(query) != ERROR_SUCCESS)
+                    continue;
                 if (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal) == ERROR_SUCCESS)
                 {
+                    cpuValue.store(static_cast<float>(counterVal.doubleValue));
                     cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
                     index = (index + 1) % cpuHistory.size();
 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(450));
                 }
+                std::this_thread::sleep_for(std::chrono::milliseconds(450));
             }
         });
     SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
-    cpuThread.join();
+    //cpuThread.join();
 }
 
 const std::string CpuMonitor::getCPUStr() const
@@ -61,9 +72,30 @@ const std::string CpuMonitor::getCPUStr() const
     return std::string(CPUBrandString);
 }
 
+const std::atomic<float>& CpuMonitor::getCPUValue() const
+{
+    return cpuValue;
+}
+
 const std::array<float, 10>& CpuMonitor::getCPUMetrics() const
 {
 	return cpuHistory;
+}
+
+void CpuMonitor::stopPolling()
+{
+    if (!running.exchange(false))
+        return;
+
+    if (cpuThread.joinable())
+        cpuThread.join();
+
+    if (query != nullptr)
+    {
+        PdhCloseQuery(query);
+        query = nullptr;
+        counter = nullptr;
+    }
 }
 
 CpuMonitor::~CpuMonitor()

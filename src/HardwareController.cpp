@@ -11,30 +11,31 @@ HardwareController::HardwareController()
 
 void HardwareController::getCPUInfo()
 {
-    if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
-        return;
-    //if (PdhAddCounter(query, TEXT("\\Processor(_Total)\\% Processor Time"), 0, &counter) != ERROR_SUCCESS)
-    if (PdhAddCounterW(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
-        return;
+    //if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
+    //    return;
+    ////if (PdhAddCounter(query, TEXT("\\Processor(_Total)\\% Processor Time"), 0, &counter) != ERROR_SUCCESS)
+    //if (PdhAddCounterW(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
+    //    return;
 
+    ////SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
+    //cpuThread = std::thread([this]()
+    //{
+    //    while (running.load())
+    //    {
+    //        PdhCollectQueryData(query);
+    //        PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
+    //        cpuValue.store(counterVal.doubleValue);
+    //        if (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal) == ERROR_SUCCESS)
+    //        {
+    //            cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
+    //            index = (index + 1) % cpuHistory.size();
+
+    //            std::this_thread::sleep_for(std::chrono::milliseconds(thread_Update));
+    //        }
+    //    }
+    //});
     //SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
-    cpuThread = std::thread([this]()
-    {
-        while (running.load())
-        {
-            PdhCollectQueryData(query);
-            PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
-            cpuValue.store(counterVal.doubleValue);
-            if (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal) == ERROR_SUCCESS)
-            {
-                cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
-                index = (index + 1) % cpuHistory.size();
-
-                std::this_thread::sleep_for(std::chrono::milliseconds(thread_Update));
-            }
-        }
-    });
-    SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
+    cpuMonitor.pollCPUMetrics();
 }
 
 void HardwareController::setRAMInfo()
@@ -69,32 +70,33 @@ MEMORYSTATUSEX HardwareController::getRAM() const
     return memInfo;
 }
 
-std::string HardwareController::getCPUBrandStr()
+std::string HardwareController::getCPUBrandStr() const
 {
-    char CPUBrandString[length_cpuBrandStr] = "";
+    //char CPUBrandString[length_cpuBrandStr] = "";
 
-    int CPUInfo[4] = {};
-    unsigned nExIds, i = 0;
-    __cpuid(CPUInfo, 0x80000000);
-    nExIds = CPUInfo[0];
-    for (i = 0x80000000; i <= nExIds; ++i)
-    {
-        __cpuid(CPUInfo, i);
-        // Interpret CPU brand string
-        switch (i)
-        {
-            case 0x80000002: 
-                memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-                break;
-            case 0x80000003: 
-                memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-                break;
-            case 0x80000004: 
-                memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
-                break;
-        }
-    }
-    return std::string(CPUBrandString);
+    //int CPUInfo[4] = {};
+    //unsigned nExIds, i = 0;
+    //__cpuid(CPUInfo, 0x80000000);
+    //nExIds = CPUInfo[0];
+    //for (i = 0x80000000; i <= nExIds; ++i)
+    //{
+    //    __cpuid(CPUInfo, i);
+    //    // Interpret CPU brand string
+    //    switch (i)
+    //    {
+    //        case 0x80000002: 
+    //            memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+    //            break;
+    //        case 0x80000003: 
+    //            memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+    //            break;
+    //        case 0x80000004: 
+    //            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+    //            break;
+    //    }
+    //}
+    //return std::string(CPUBrandString);
+    return cpuMonitor.getCPUStr();
 }
 
 SYSTEM_INFO& HardwareController::getSysInfo()
@@ -105,12 +107,16 @@ SYSTEM_INFO& HardwareController::getSysInfo()
 
 float HardwareController::getCPUValue() const
 {
-    return cpuValue;
+    //return cpuValue;
+    std::cout << "getCPUValue returned" << std::endl;
+    return cpuMonitor.getCPUValue();
 }
 
 const std::array<float, 10>& HardwareController::getCPUHistory() const
 {
-    return cpuHistory;
+    //return cpuHistory;
+    std::cout << "getCPUMetrics returned array" << std::endl;
+    return cpuMonitor.getCPUMetrics();
 }
 
 void HardwareController::getProcessesInfo()
@@ -146,23 +152,6 @@ void HardwareController::getProcessesInfo()
     });
 }
 
-// testing
-std::wstring HardwareController::wstringConvert(const char* word)
-{
-    if (!word) return L"";
-
-    int neededSize = MultiByteToWideChar(CP_UTF8, 0, word, -1, nullptr, 0);
-    if (neededSize <= 0) return L"";
-    std::wstring convertedWord(neededSize, 0);
-    MultiByteToWideChar(CP_UTF8, 0, word, -1, &convertedWord[0], neededSize);
-    
-    // remove the null-terminator '\0'
-    if (!convertedWord.empty() && convertedWord.back() == L'\0')
-        convertedWord.pop_back();
-
-    return convertedWord;
-}
-
 std::map<std::string, std::vector<ProcessInfo>>& HardwareController::getProcessMap()
 {
     return processMap;
@@ -192,11 +181,26 @@ HardwareController::~HardwareController()
 {
     running.store(false);
     PdhCloseQuery(query);
-    //CloseHandle(hSnap); 
+    //CloseHandle(hSnap);
     
     //if (cpuThread.joinable()) cpuThread.join();
 
     //if (processesThread.joinable()) processesThread.join();
 
     //if (ramThread.joinable()) ramThread.join();
+
+    ramRunning.store(false);
+    if (cpuMonitor.getCPUValue())
+    {
+
+    }
+
+    if (hSnap != INVALID_HANDLE_VALUE)
+        CloseHandle(hSnap);
+
+    if (processThread.joinable())
+        processThread.join();
+
+    if (ramThread.joinable())
+        ramThread.join();
 }

@@ -145,10 +145,9 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
     uint64_t usedBytes = ramUsed.load(std::memory_order_relaxed);*/
 
     ImGui::Begin("RAM");
-    //ImGui::Text("%.0fMB installed", (double)totalBytes / (1024 * 1024));
-    //ImGui::Text("%.0fMB used", (double)usedBytes / (1024 * 1024));
     ImGui::Text("%.0fMB installed", (double) totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024));
-    ImGui::Text("%.0fMB used", (double) ramUsed.load(std::memory_order_relaxed) / (1024*1024));
+    ImGui::Text("%.0fMB used", (double) ramUsed.load(std::memory_order_relaxed) / (1024 * 1024));
+    ImGui::Text("%.0fMB available", ((double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024) - (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024)));
     if (ImPlot::BeginPlot("RAM Usage"))
     {
         ImPlot::SetupAxes("Intervals (Every 3s)", "Percent Used");
@@ -192,13 +191,13 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
         ImGui::TableHeadersRow();
 
         static int selectedIndex, index = -1;
-        bool isSelected = false; // start on false, will be used eventually
+        //bool isSelected = false; // start on false, will be used eventually
         for (auto iterator = processMap.begin(); iterator != processMap.end(); ++iterator)
         {
             const std::string& processName = iterator->first; // might not need this
             const std::vector<ProcessInfo>& processList = iterator->second;
 
-            // if theres more than 1 process with the same exe name
+            // if theres more than 1 process with the same name (*.exe)
             if (processList.size() > 1)
             {
                 ImGui::TableNextRow();

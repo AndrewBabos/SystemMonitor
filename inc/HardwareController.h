@@ -17,16 +17,10 @@
 #include <unordered_map>
 #pragma comment(lib, "pdh.lib")
 
+#include "CpuMonitor.h"
+
 #define thread_Update 450 // 0x1C2 (ms)
 #define length_cpuBrandStr 64 // 0x40 64 bytes length
-
-//struct CPUInfo
-//{
-//	uint8_t cores = 0;
-//	uint8_t logicalCores = 0;
-//	uint16_t baseClockMHz = 0;
-//	uint16_t maxClockMHz = 0;
-//};
 
 struct ProcessInfo
 {
@@ -42,6 +36,7 @@ class HardwareController
 {
 private:
 	SYSTEM_INFO sysInfo;
+	CpuMonitor cpuMonitor;
 
 	// cpu vars
 	std::atomic<bool> running = { true };
@@ -73,10 +68,6 @@ private:
 
 	uint8_t ramIndex = 0;
 
-	// convert to wstring 
-	// pretty sure i dont need this
-	std::wstring wstringConvert(const char* word);
-
 	// glfw
 	bool vsync;
 
@@ -86,7 +77,7 @@ public:
 
 	// CpuMonitor class
 	void getCPUInfo();
-	std::string getCPUBrandStr();
+	std::string getCPUBrandStr() const;
 	float getCPUValue() const;
 	const std::array<float, 10>& getCPUHistory() const;
 

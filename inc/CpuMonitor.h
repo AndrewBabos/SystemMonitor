@@ -21,7 +21,7 @@
 class CpuMonitor
 {
 private:
-	std::atomic<bool>	 running = { true };
+	std::atomic<bool>	 running;
 	std::thread			 cpuThread;
 	PDH_HQUERY			 query;
 	PDH_HCOUNTER		 counter;

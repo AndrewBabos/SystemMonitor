@@ -2,10 +2,10 @@
 
 CpuMonitor::CpuMonitor()
 {
-	//running.store(false); // thread wasnt being used
-    /*query = {};
+	running.store(true);
+    query = {};
     counter = {};
-    counterVal = {};*/
+    counterVal = {};
 }
 
 void CpuMonitor::pollCPUMetrics()

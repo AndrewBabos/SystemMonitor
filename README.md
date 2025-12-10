@@ -45,22 +45,15 @@ psapi.lib
 
 ---
 
-## Building
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/AndrewBabos/SystemMonitor.git
-   cd SystemMonitor
-   ```
-2. Add ImGui and ImPlot source files to your project.
-3. Include headers:
-   ```cpp
-   #include <windows.h>
-   #include <pdh.h>
-   #include <psapi.h>
-   #include <tlhelp32.h>
-   ```
-4. Build with a C++20-capable compiler (MSVC recommended).
+## Building (Visual Studio)
+1. ```bat
+git clone https://github.com/AndrewBabos/SystemMonitor.git
+cd SystemMonitor
+2. 
+cmake -S . -B build -G "Visual Studio 17 2022"
+cmake --build build --config Release
+3. OR
+In VS: File → Open → Folder… → select repo root → CMake will configure automatically.
 
 ---
 

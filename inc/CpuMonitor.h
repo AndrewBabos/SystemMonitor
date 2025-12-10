@@ -28,11 +28,14 @@ private:
 	PDH_FMT_COUNTERVALUE counterVal;
 	std::atomic<float>	 cpuValue = { 0.0 };
 	std::array<float,10> cpuHistory{};
+	std::vector<float> individualCoreHistory;
+
 	uint8_t index = 0;
 
 public:
 	CpuMonitor();
 	void pollCPUMetrics();
+	void pollIndividualCoreMetrics();
 	void stopPolling();
 	const std::string getCPUStr() const;
 	const std::atomic<float>& getCPUValue() const;

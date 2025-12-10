@@ -39,14 +39,14 @@ private:
 	CpuMonitor cpuMonitor;
 
 	// cpu vars
-	std::atomic<bool> running = { true };
-	std::thread cpuThread;
-	PDH_HQUERY query;
-	PDH_HCOUNTER counter;
-	PDH_FMT_COUNTERVALUE counterVal;
-	std::atomic<float> cpuValue = { 0.0 };
-	std::array<float, 10> cpuHistory{};
-	uint8_t index = 0;
+	//std::atomic<bool> running = { true };
+	//std::thread cpuThread;
+	//PDH_HQUERY query;
+	//PDH_HCOUNTER counter;
+	//PDH_FMT_COUNTERVALUE counterVal;
+	//std::atomic<float> cpuValue = { 0.0 };
+	//std::array<float, 10> cpuHistory{};
+	//uint8_t index = 0;
 
 //	Mike Topp
 
@@ -61,7 +61,7 @@ private:
 	// ram memory
 	std::thread ramThread;
 	MEMORYSTATUSEX memInfo;
-	std::atomic<bool> ramRunning{ true }; 
+	std::atomic<bool> ramRunning{ true };
 	std::array<float, 10> ramHistory{};
 	std::atomic<float> ramValue; // percent
 	std::atomic<uint64_t> ramUsed, totalPhysRAM{0};

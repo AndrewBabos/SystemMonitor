@@ -1,77 +1,54 @@
-# Visual Studio build artifacts
+# Build directories
+/build/
+/out/
+/bin/
+/lib/
+/CMakeFiles/
+/CMakeCache.txt
+
+# Visual Studio generated files
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.vs/
+*.vcproj
+*.vcproj.filters
+
+# CMake build artifacts inside source tree
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/CMakeScripts/
+**/*.cmake.user
+**/*.dir/
+
+# Compiled objects and binaries
 *.obj
+*.o
 *.pdb
-*.idb
-*.pch
-*.ipch
 *.ilk
-*.log
-*.tlog
-*.sbr
-*.tlh
-*.tli
-*.tmp
 *.exe
 *.dll
 *.lib
 *.exp
-*.ncb
-*.sdf
-*.opensdf
-*.cachefile
-*.db
-*.opendb
+*.idb
 
-# Build folders
-[Bb]in/
-[Dd]ebug*/
-[Rr]elease*/
-[xX]64/
-[xX]86/
-#[Bb]uild/
-[Oo]ut/
-*.vs/
-.vs/
-
-# CMake intermediate files
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-
-# Visual Studio user settings
-*.user
-*.userosscache
-*.suo
-*.vcxproj.user
-
-# Backup / temp files
-*.bak
-*.tmp
+# ImGui / GLAD / GLFW build outputs
+**/Debug/
+**/Release/
+**/RelWithDebInfo/
+**/MinSizeRel/
 *.log
-*.old
+*.tlog
 
-# ImGui / GLFW vendor libs (if added as binaries)
-*.lib
-*.dll
-*.a
-*.so
-*.dylib
+# VS cache
+.vscode/
+.vs/
+*.ipch
+*.opendb
+*.VC.db
 
-# Generated files
-*.manifest
-*.iobj
-*.ipdb
-
-# OS metadata
+# OS junk
 .DS_Store
 Thumbs.db
-
-# Optional: ignore Visual Studio solution metadata
-*.VC.db
-*.VC.VC.opendb
-
-# ImGui positions
-*.ini
-packages.config
-/packages

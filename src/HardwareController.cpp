@@ -6,35 +6,10 @@ HardwareController::HardwareController()
     hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     pe.dwSize = sizeof(PROCESSENTRY32);
 	vsync = false;
-
 }
 
 void HardwareController::getCPUInfo()
 {
-    //if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
-    //    return;
-    ////if (PdhAddCounter(query, TEXT("\\Processor(_Total)\\% Processor Time"), 0, &counter) != ERROR_SUCCESS)
-    //if (PdhAddCounterW(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
-    //    return;
-
-    ////SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
-    //cpuThread = std::thread([this]()
-    //{
-    //    while (running.load())
-    //    {
-    //        PdhCollectQueryData(query);
-    //        PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal);
-    //        cpuValue.store(counterVal.doubleValue);
-    //        if (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &counterVal) == ERROR_SUCCESS)
-    //        {
-    //            cpuHistory[index] = static_cast<float>(counterVal.doubleValue);
-    //            index = (index + 1) % cpuHistory.size();
-
-    //            std::this_thread::sleep_for(std::chrono::milliseconds(thread_Update));
-    //        }
-    //    }
-    //});
-    //SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
     cpuMonitor.pollCPUMetrics();
 }
 
@@ -72,30 +47,6 @@ MEMORYSTATUSEX HardwareController::getRAM() const
 
 std::string HardwareController::getCPUBrandStr() const
 {
-    //char CPUBrandString[length_cpuBrandStr] = "";
-
-    //int CPUInfo[4] = {};
-    //unsigned nExIds, i = 0;
-    //__cpuid(CPUInfo, 0x80000000);
-    //nExIds = CPUInfo[0];
-    //for (i = 0x80000000; i <= nExIds; ++i)
-    //{
-    //    __cpuid(CPUInfo, i);
-    //    // Interpret CPU brand string
-    //    switch (i)
-    //    {
-    //        case 0x80000002: 
-    //            memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-    //            break;
-    //        case 0x80000003: 
-    //            memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-    //            break;
-    //        case 0x80000004: 
-    //            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
-    //            break;
-    //    }
-    //}
-    //return std::string(CPUBrandString);
     return cpuMonitor.getCPUStr();
 }
 
@@ -141,9 +92,7 @@ void HardwareController::getProcessesInfo()
                     info.gpuUsage = 0.0f;
                     info.networkUsage = 0.0f;
 
-                    //processList.push_back(info);
                     processMap[info.name].push_back(info);
-                    //processList.push_back({ pe.th32ProcessID, pe.szExeFile, 0.0f, 0.0f, 0.0f, 0.0f });
                 } while (Process32Next(hSnap, &pe));
             }
             CloseHandle(hSnap);
@@ -177,10 +126,6 @@ std::atomic<uint64_t>& HardwareController::getTotalPhysRAM()
 
 HardwareController::~HardwareController()
 {
-    running.store(false);
-    PdhCloseQuery(query);
-    //CloseHandle(hSnap);
-    
     //if (cpuThread.joinable()) cpuThread.join();
 
     //if (processesThread.joinable()) processesThread.join();

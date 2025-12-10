@@ -16,11 +16,11 @@ void CpuMonitor::pollCPUMetrics()
         return;
     }
     if (PdhAddCounterW(query, L"\\Processor(_Total)\\% Processor Time", 0, &counter) != ERROR_SUCCESS)
-     {
-         running.store(false);
-         PdhCloseQuery(query);
-         return;
-     }
+    {
+        running.store(false);
+        PdhCloseQuery(query);
+        return;
+    }
     cpuThread = std::thread([this]()
     {
         while (running.load())
@@ -38,6 +38,11 @@ void CpuMonitor::pollCPUMetrics()
         }
     });
     SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
+}
+
+void CpuMonitor::pollIndividualCoreMetrics()
+{
+
 }
 
 void CpuMonitor::stopPolling()

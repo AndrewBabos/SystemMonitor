@@ -123,8 +123,6 @@ void UiController::renderOptionsAndDockspace()
 void UiController::renderCPU(const std::atomic<float>& cpuValue, const std::array<float, 10>& cpuHistory)
 {
     ImGui::Begin("CPU");
-    ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
-    ImGui::Separator();
     if (ImPlot::BeginPlot("CPU Usage"))
     {
         ImPlot::SetupAxes("Intervals (Every 450ms)", "Percent Used");
@@ -133,6 +131,9 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, const std::arra
         ImPlot::PlotLine("Usage", cpuHistory.data(), cpuHistory.size());
         ImPlot::EndPlot();
     }
+    ImGui::Separator();
+    ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
+    ImGui::Text("CPU Clock Frequency: ");
     ImGui::End();
 }
 
@@ -145,9 +146,6 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
     uint64_t usedBytes = ramUsed.load(std::memory_order_relaxed);*/
 
     ImGui::Begin("RAM");
-    ImGui::Text("%.0fMB installed", (double) totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024));
-    ImGui::Text("%.0fMB used", (double) ramUsed.load(std::memory_order_relaxed) / (1024 * 1024));
-    ImGui::Text("%.0fMB available", ((double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024) - (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024)));
     if (ImPlot::BeginPlot("RAM Usage"))
     {
         ImPlot::SetupAxes("Intervals (Every 3s)", "Percent Used");
@@ -156,6 +154,10 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
         ImPlot::PlotLine("Usage", ramHistory.data(), ramHistory.size());
         ImPlot::EndPlot();
     }
+    ImGui::Separator();
+    ImGui::Text("%.0fMB installed", (double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024));
+    ImGui::Text("%.0fMB used", (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024));
+    ImGui::Text("%.0fMB available", ((double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024) - (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024)));
     ImGui::End();
 }
 

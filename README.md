@@ -46,14 +46,12 @@ psapi.lib
 ---
 
 ## Building (Visual Studio)
-1. ```bat
-git clone https://github.com/AndrewBabos/SystemMonitor.git
+
+```bash
+git clone -b release --single-branch https://github.com/AndrewBabos/SystemMonitor.git
 cd SystemMonitor
-2. 
 cmake -S . -B build -G "Visual Studio 17 2022"
 cmake --build build --config Release
-3. OR
-In VS: File → Open → Folder… → select repo root → CMake will configure automatically.
 
 ---
 

@@ -68,6 +68,11 @@ const std::array<float, 10>& HardwareController::getCPUHistory() const
     return cpuMonitor.getCPUMetrics();
 }
 
+const std::vector<std::array<float, 10>>& HardwareController::getIndividualCoreHistories() const
+{
+    return cpuMonitor.getIndividualCoreHistories();
+}
+
 void HardwareController::getProcessesInfo()
 {
     if (hSnap == INVALID_HANDLE_VALUE)
@@ -86,13 +91,14 @@ void HardwareController::getProcessesInfo()
                 {
                     ProcessInfo info{};
                     info.pid = pe.th32ProcessID;
-                    info.name = pe.szExeFile;      // const wchar_t* ? std::wstring OK
+                    //info.name = pe.szExeFile;      // const wchar_t* ? std::wstring OK
                     info.cpuUsage = 0.0f;
                     info.memoryUsage = 0.0f;
                     info.gpuUsage = 0.0f;
                     info.networkUsage = 0.0f;
 
-                    processMap[info.name].push_back(info);
+                    //processMap[info.name].push_back(info);
+                    processMap[pe.szExeFile].push_back(info);
                 } while (Process32Next(hSnap, &pe));
             }
             CloseHandle(hSnap);

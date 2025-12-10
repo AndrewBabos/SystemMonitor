@@ -120,7 +120,9 @@ void UiController::renderOptionsAndDockspace()
     ImGui::End();
 }
 
-void UiController::renderCPU(const std::atomic<float>& cpuValue, const std::array<float, 10>& cpuHistory)
+void UiController::renderCPU(const std::atomic<float>& cpuValue, 
+                             const std::array<float, 10>& cpuHistory,
+                             const std::vector<std::array<float, 10>>& coreHistories)
 {
     ImGui::Begin("CPU");
     if (ImPlot::BeginPlot("CPU Usage"))
@@ -128,7 +130,14 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, const std::arra
         ImPlot::SetupAxes("Intervals (Every 450ms)", "Percent Used");
         ImPlot::SetupAxisLimits(ImAxis_X1, 0, cpuHistory.size(), ImGuiCond_Always);
         ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
-        ImPlot::PlotLine("Usage", cpuHistory.data(), cpuHistory.size());
+        ImPlot::PlotLine("Total", cpuHistory.data(), cpuHistory.size());
+        // for loop for the individual cores
+        for (size_t i = 0; i < coreHistories.size(); ++i)
+        {
+            std::string label = "Core #" + std::to_string(i);
+            //ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
+            ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
+        }
         ImPlot::EndPlot();
     }
     ImGui::Separator();

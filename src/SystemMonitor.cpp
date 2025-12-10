@@ -23,7 +23,8 @@ void SystemMonitor::render()
 
 
     UiController::renderCPU(        hwCtrl->getCPUValue(),
-                                    hwCtrl->getCPUHistory());
+                                    hwCtrl->getCPUHistory(),
+                                    hwCtrl->getIndividualCoreHistories());
     UiController::renderSysInfo(    hwCtrl->getCPUBrandStr(), 
                                     hwCtrl->getSysInfo());
     UiController::renderRAM(        hwCtrl->getRAMValue(),

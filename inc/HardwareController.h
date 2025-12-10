@@ -25,7 +25,7 @@
 struct ProcessInfo
 {
 	DWORD pid;
-	std::string name;
+	//std::string name;
 	float cpuUsage;
 	float memoryUsage;
 	float gpuUsage;
@@ -80,6 +80,8 @@ public:
 	std::string getCPUBrandStr() const;
 	float getCPUValue() const;
 	const std::array<float, 10>& getCPUHistory() const;
+	const std::vector<std::array<float, 10>>& getIndividualCoreHistories() const;
+
 
 	// RamMonitor class
 	void setRAMInfo();

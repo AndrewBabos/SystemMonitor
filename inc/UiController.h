@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "implot.h"
 #include <iostream>
+#include <cstring>
 #include <thread>
 #include <atomic>
 #include <array>
@@ -21,7 +22,8 @@ namespace UiController
 	void renderOptionsAndDockspace();
 
 	void renderCPU(const std::atomic<float>& cpuValue, 
-				   const std::array<float, 10>& cpuHistory);
+				   const std::array<float, 10>& cpuHistory,
+				   const std::vector<std::array<float, 10>>& coreHistories);
 
 	void renderRAM(const std::atomic<float>& ramValue,
 				   const std::array<float, 10>& ramHistory,

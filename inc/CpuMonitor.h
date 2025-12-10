@@ -25,20 +25,22 @@ private:
 	std::thread			 cpuThread;
 	PDH_HQUERY			 query;
 	PDH_HCOUNTER		 counter;
+	std::vector<PDH_HCOUNTER> coreCounters;
 	PDH_FMT_COUNTERVALUE counterVal;
 	std::atomic<float>	 cpuValue = { 0.0 };
 	std::array<float,10> cpuHistory{};
-	std::vector<float> individualCoreHistory;
+	//std::vector<float>	 individualCoreValues;
+	std::vector<std::array<float, 10>> coreHistories;  // one history per core
 
 	uint8_t index = 0;
 
 public:
 	CpuMonitor();
 	void pollCPUMetrics();
-	void pollIndividualCoreMetrics();
 	void stopPolling();
 	const std::string getCPUStr() const;
 	const std::atomic<float>& getCPUValue() const;
 	const std::array<float, 10>& getCPUMetrics() const;
+	const std::vector<std::array<float, 10>>& getIndividualCoreHistories() const;
 	~CpuMonitor();
 };

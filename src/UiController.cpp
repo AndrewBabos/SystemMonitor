@@ -135,7 +135,6 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue,
         for (size_t i = 0; i < coreHistories.size(); ++i)
         {
             std::string label = "Core #" + std::to_string(i);
-            //ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
             ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
         }
         ImPlot::EndPlot();

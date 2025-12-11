@@ -132,11 +132,34 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue,
         ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
         ImPlot::PlotLine("Total", cpuHistory.data(), cpuHistory.size());
         // individual cores
-        for (size_t i = 0; i < coreHistories.size(); ++i)
+        /*if (ImGui::Button("Individual Cores"))
+            CpuCore_Flag = !CpuCore_Flag;*/
+
+        /*switch (CpuCore_Flag)
+        {
+        case true:
+            for (size_t i = 0; i < coreHistories.size(); ++i)
+            {
+                std::string label = "Core #" + std::to_string(i);
+                ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
+            }
+            break;
+        case false:
+            break;
+        }*/
+        /*if (CpuCore_Flag)
+        {
+            for (size_t i = 0; i < coreHistories.size(); ++i)
+            {
+                std::string label = "Core #" + std::to_string(i);
+                ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
+            }
+        }*/
+        /*for (size_t i = 0; i < coreHistories.size(); ++i)
         {
             std::string label = "Core #" + std::to_string(i);
             ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
-        }
+        }*/
         ImPlot::EndPlot();
     }
     ImGui::Separator();

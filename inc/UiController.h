@@ -19,6 +19,8 @@
 
 namespace UiController
 {
+	//bool CpuCore_Flag = false;
+
 	void renderOptionsAndDockspace();
 
 	void renderCPU(const std::atomic<float>& cpuValue, 

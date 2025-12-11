@@ -26,6 +26,7 @@ set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/imgui)
 
 set(IMGUI_SOURCES
     ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
     ${IMGUI_DIR}/imgui_draw.cpp
     ${IMGUI_DIR}/imgui_tables.cpp
     ${IMGUI_DIR}/imgui_widgets.cpp
@@ -34,7 +35,7 @@ set(IMGUI_SOURCES
 
     ${IMGUI_DIR}/implot.cpp
     ${IMGUI_DIR}/implot_items.cpp
-    #${IMGUI_DIR}/implot_demo.cpp
+    ${IMGUI_DIR}/implot_demo.cpp
 )
 
 # -------- Your Code --------

@@ -25,11 +25,11 @@ private:
 	std::thread			 cpuThread;
 	PDH_HQUERY			 query;
 	PDH_HCOUNTER		 counter;
-	std::vector<PDH_HCOUNTER> coreCounters;
+	std::vector<PDH_HCOUNTER> coreCounters; // cores n+1
 	PDH_FMT_COUNTERVALUE counterVal;
-	std::atomic<float>	 cpuValue = { 0.0 };
+	std::atomic<float>	 cpuValue = { 0.0 }; // total cores avg %
 	std::array<float,10> cpuHistory{};
-	//std::vector<float>	 individualCoreValues;
+	// # of Cores | That cores history
 	std::vector<std::array<float, 10>> coreHistories;  // one history per core
 
 	uint8_t index = 0;

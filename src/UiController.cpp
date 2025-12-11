@@ -131,7 +131,7 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue,
         ImPlot::SetupAxisLimits(ImAxis_X1, 0, cpuHistory.size(), ImGuiCond_Always);
         ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
         ImPlot::PlotLine("Total", cpuHistory.data(), cpuHistory.size());
-        // for loop for the individual cores
+        // individual cores
         for (size_t i = 0; i < coreHistories.size(); ++i)
         {
             std::string label = "Core #" + std::to_string(i);
@@ -141,7 +141,7 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue,
     }
     ImGui::Separator();
     ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
-    ImGui::Text("CPU Clock Frequency: ");
+    ImGui::Text("CPU Clock Frequency: <work in progress>");
     ImGui::End();
 }
 

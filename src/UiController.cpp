@@ -63,11 +63,19 @@ void UiController::renderOptionsAndDockspace()
                     if (ImGui::Button("Up"));// fontScale += 0.1f;
                     ImGui::SameLine();
                     if (ImGui::Button("Down")); //fontScale -= 0.1f;
-                    io.FontGlobalScale = fontScale;
-                    ImGui::Text("Not implemented yet");
+                        io.FontGlobalScale = fontScale;
+                    ImGui::Text("<Not implemented yet>");
                     ImGui::Text("Font Scale: %.1f", fontScale);
                     ImGui::TreePop();
                 }
+                if (ImGui::TreeNode("Window Size"))
+                {
+                    ImGui::Text("asd");
+                    ImGui::SameLine();
+                    ImGui::Button("Set");
+                    ImGui::TreePop();
+                }
+                ImGui::Button("breaks");
                 if (ImGui::MenuItem("Flag: NoDockingOverCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingOverCentralNode) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingOverCentralNode; }
                 if (ImGui::MenuItem("Flag: NoDockingSplit", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingSplit) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingSplit; }
                 if (ImGui::MenuItem("Flag: NoUndocking", "", (dockspace_flags & ImGuiDockNodeFlags_NoUndocking) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoUndocking; }
@@ -120,6 +128,16 @@ void UiController::renderOptionsAndDockspace()
     ImGui::End();
 }
 
+void UiController::renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInfo)
+{
+    ImGui::Begin("System Information");
+    ImGui::Text("Processor:          %s", CPUBrandString.c_str());
+    ImGui::Text("Number of Cores:   %d", sysInfo.dwNumberOfProcessors);
+    ImGui::Text("Processor Architecture:   %d", sysInfo.wProcessorArchitecture);
+    ImGui::Separator();
+    ImGui::End();
+}
+
 void UiController::renderCPU(const std::atomic<float>& cpuValue, 
                              const std::array<float, 10>& cpuHistory,
                              const std::vector<std::array<float, 10>>& coreHistories)
@@ -130,36 +148,32 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue,
         ImPlot::SetupAxes("Intervals (Every 450ms)", "Percent Used");
         ImPlot::SetupAxisLimits(ImAxis_X1, 0, cpuHistory.size(), ImGuiCond_Always);
         ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
-        ImPlot::PlotLine("Total", cpuHistory.data(), cpuHistory.size());
-        // individual cores
-        /*if (ImGui::Button("Individual Cores"))
-            CpuCore_Flag = !CpuCore_Flag;*/
+        if (plotCoreType)
+        {
+            if (ImGui::Button("Total Cores"))
+                plotCoreType = !plotCoreType;
+        }
+        else
+        {
+            if (ImGui::Button("Individual Cores"))
+                plotCoreType = !plotCoreType;
+        }
 
-        /*switch (CpuCore_Flag)
+        // actual display
+        switch (plotCoreType)
         {
-        case true:
-            for (size_t i = 0; i < coreHistories.size(); ++i)
-            {
-                std::string label = "Core #" + std::to_string(i);
-                ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
-            }
-            break;
-        case false:
-            break;
-        }*/
-        /*if (CpuCore_Flag)
-        {
-            for (size_t i = 0; i < coreHistories.size(); ++i)
-            {
-                std::string label = "Core #" + std::to_string(i);
-                ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
-            }
-        }*/
-        /*for (size_t i = 0; i < coreHistories.size(); ++i)
-        {
-            std::string label = "Core #" + std::to_string(i);
-            ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
-        }*/
+            case true:
+                for (size_t i = 0; i < coreHistories.size(); ++i)
+                {
+                    std::string label = "Core #" + std::to_string(i);
+                    ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
+                }
+                break;
+            case false:
+                for (size_t i = 0; i < coreHistories.size(); ++i)
+                    ImPlot::PlotLine("Total", cpuHistory.data(), cpuHistory.size());
+                break;
+        }
         ImPlot::EndPlot();
     }
     ImGui::Separator();
@@ -173,16 +187,13 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
                              const std::atomic<uint64_t>& ramUsed,
                              const std::atomic<uint64_t>& totalPhysRAM)
 {
-    /*uint64_t totalBytes = totalPhysRAM.load(std::memory_order_relaxed);
-    uint64_t usedBytes = ramUsed.load(std::memory_order_relaxed);*/
-
     ImGui::Begin("RAM");
     if (ImPlot::BeginPlot("RAM Usage"))
     {
         ImPlot::SetupAxes("Intervals (Every 3s)", "Percent Used");
         ImPlot::SetupAxisLimits(ImAxis_X1, 0, ramHistory.size(), ImGuiCond_Always);
         ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
-        ImPlot::PlotLine("Usage", ramHistory.data(), ramHistory.size());
+        ImPlot::PlotLine("Used", ramHistory.data(), ramHistory.size());
         ImPlot::EndPlot();
     }
     ImGui::Separator();
@@ -198,14 +209,9 @@ void UiController::renderGPU()
     ImGui::End();
 }
 
-void UiController::renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInfo)
+void UiController::renderNetwork()
 {
-    ImGui::Begin("System Information");
-    ImGui::Text("Processor:          %s", CPUBrandString.c_str());
-    ImGui::Text("Number of Cores:   %d", sysInfo.dwNumberOfProcessors);
-    ImGui::Text("Processor Architecture:   %d", sysInfo.wProcessorArchitecture);
-    ImGui::Separator();
-    ImGui::End();
+
 }
 
 void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap)
@@ -220,7 +226,7 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
 
     if (ImGui::BeginTable("ProcessesTable", 6, flags, ImVec2(0.0f, TEXT_BASE_HEIGHT * 15), 0.0f))
     {
-        ImGui::TableSetupColumn("Process ID (PID)", ImGuiTableColumnFlags_DefaultSort, 0.0f, 0); // <-- ColumnUserID = 0
+        ImGui::TableSetupColumn("Process ID", ImGuiTableColumnFlags_DefaultSort, 0.0f, 0); // <-- ColumnUserID = 0
         ImGui::TableSetupColumn("Process Name");
         ImGui::TableSetupColumn("CPU");
         ImGui::TableSetupColumn("Memory");

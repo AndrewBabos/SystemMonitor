@@ -16,12 +16,18 @@
 //#include <Psapi.h>
 //#pragma comment(lib, "psapi.lib")
 
+enum class UiStates
+{
+	Idle,
+	MenuOptions
+};
 
 namespace UiController
 {
-	//bool CpuCore_Flag = false;
+	static bool plotCoreType = true; // false = total | true = individual
 
 	void renderOptionsAndDockspace();
+	void renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInfo);
 
 	void renderCPU(const std::atomic<float>& cpuValue, 
 				   const std::array<float, 10>& cpuHistory,
@@ -33,9 +39,8 @@ namespace UiController
 				   const std::atomic<uint64_t>& totalPhysRAM);
 
 	void renderGPU();
-	
-	void renderSysInfo(std::string CPUBrandString,
-		               SYSTEM_INFO& sysInfo);
+
+	void renderNetwork();
 
 	void renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap);
 	

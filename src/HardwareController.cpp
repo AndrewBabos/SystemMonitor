@@ -80,7 +80,6 @@ void HardwareController::getProcessesInfo()
         std::cout << "ERROR GETTING stuff idk\n";
         return;
     }
-
     processesThread = std::thread([this]() 
     {
             hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -91,7 +90,6 @@ void HardwareController::getProcessesInfo()
                 {
                     ProcessInfo info{};
                     info.pid = pe.th32ProcessID;
-                    //info.name = pe.szExeFile;      // const wchar_t* ? std::wstring OK
                     info.cpuUsage = 0.0f;
                     info.memoryUsage = 0.0f;
                     info.gpuUsage = 0.0f;
@@ -132,23 +130,19 @@ std::atomic<uint64_t>& HardwareController::getTotalPhysRAM()
 
 HardwareController::~HardwareController()
 {
-    //if (cpuThread.joinable()) cpuThread.join();
-
-    //if (processesThread.joinable()) processesThread.join();
-
-    //if (ramThread.joinable()) ramThread.join();
+    cpuMonitor.stopPolling();
 
     ramRunning.store(false);
-    if (cpuMonitor.getCPUValue())
+    /*if (cpuMonitor.getCPUValue())
     {
 
-    }
+    }*/
 
     if (hSnap != INVALID_HANDLE_VALUE)
         CloseHandle(hSnap);
 
-    if (processThread.joinable())
-        processThread.join();
+    if (processesThread.joinable())
+        processesThread.join();
 
     if (ramThread.joinable())
         ramThread.join();

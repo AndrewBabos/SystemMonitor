@@ -2,7 +2,7 @@
 
 CpuMonitor::CpuMonitor()
 {
-	running.store(true);
+	running.store(true, std::memory_order_relaxed);
     query = {};
     counter = {};
     counterVal = {};
@@ -10,6 +10,8 @@ CpuMonitor::CpuMonitor()
 
 void CpuMonitor::pollCPUMetrics()
 {
+    //running.store(true, std::memory_order_relaxed); // might not need this here
+
     if (PdhOpenQuery(NULL, 0, &query) != ERROR_SUCCESS)
     {
         std::cout << "Error line 15 CpuMonitor.cpp\n";
@@ -148,6 +150,5 @@ const std::vector<std::array<float, 10>>& CpuMonitor::getIndividualCoreHistories
 CpuMonitor::~CpuMonitor()
 {
     // pretty sure this stops it?
-    if (cpuThread.joinable())
-        cpuThread.join();
+    stopPolling();
 }

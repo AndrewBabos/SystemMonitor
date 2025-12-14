@@ -51,10 +51,8 @@ private:
 //	Mike Topp
 
 	// processes list
-	std::thread processThread;
 	HANDLE hSnap;
 	PROCESSENTRY32 pe;
-
 	std::thread processesThread;
 	std::map<std::string, std::vector<ProcessInfo>> processMap;
 

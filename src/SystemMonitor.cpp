@@ -8,8 +8,8 @@ SystemMonitor::SystemMonitor()
     vsync = false;
 
     // list of processes
-    hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    pe.dwSize = sizeof(PROCESSENTRY32);
+    /*hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    pe.dwSize = sizeof(PROCESSENTRY32);*/
 
     hwCtrl->getCPUInfo();
     hwCtrl->getProcessesInfo();
@@ -25,41 +25,43 @@ void SystemMonitor::render()
     UiController::renderCPU(        hwCtrl->getCPUValue(),
                                     hwCtrl->getCPUHistory(),
                                     hwCtrl->getIndividualCoreHistories());
-    UiController::renderSysInfo(    hwCtrl->getCPUBrandStr(), 
-                                    hwCtrl->getSysInfo());
     UiController::renderRAM(        hwCtrl->getRAMValue(),
                                     hwCtrl->getRAMHistory(),
                                     hwCtrl->getUsedRAM(),
                                     hwCtrl->getTotalPhysRAM());
-    UiController::renderProcesses(  getHandle(), 
-                                    getProcessEntry(), 
+    UiController::renderGPU         (    ); // put stuff ehre
+    UiController::renderSysInfo  (  hwCtrl->getCPUBrandStr(), 
+                                    hwCtrl->getSysInfo());
+    UiController::renderProcesses(  hwCtrl->getHandle(),
+                                    hwCtrl->getProcessEntry(),
                                     hwCtrl->getProcessMap());
 
+
     // references to their docs
-    ImGui::ShowDemoWindow();
-    ImPlot::ShowDemoWindow();
+    //ImGui::ShowDemoWindow();
+    //ImPlot::ShowDemoWindow();
 
 	ImGui::End();
 }
 
-bool SystemMonitor::setVsync()
+bool SystemMonitor::setVsync() const
 {
     return !vsync;
 }
 
-const HANDLE& SystemMonitor::getHandle() const
-{
-    return hSnap;
-}
-
-const PROCESSENTRY32& SystemMonitor::getProcessEntry() const
-{
-    return pe;
-}
+//const HANDLE& SystemMonitor::getHandle() const
+//{
+//    return hSnap;
+//}
+//
+//const PROCESSENTRY32& SystemMonitor::getProcessEntry() const
+//{
+//    return pe;
+//}
 
 SystemMonitor::~SystemMonitor()
 {
-    CloseHandle(hSnap);
+    //CloseHandle(hSnap);
     // pretty sure trying to stop a thread makes it crash
     // its a unique pointer so no need for delete
     //delete hwCtrl; // dont know why this crashes

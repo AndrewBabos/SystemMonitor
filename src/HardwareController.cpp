@@ -128,6 +128,16 @@ std::atomic<uint64_t>& HardwareController::getTotalPhysRAM()
     return totalPhysRAM;
 }
 
+const HANDLE& HardwareController::getHandle() const
+{
+    return hSnap;
+}
+
+const PROCESSENTRY32& HardwareController::getProcessEntry() const
+{
+    return pe;
+}
+
 HardwareController::~HardwareController()
 {
     cpuMonitor.stopPolling();

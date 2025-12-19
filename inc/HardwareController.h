@@ -93,7 +93,8 @@ public:
 	SYSTEM_INFO& getSysInfo();
 	void getProcessesInfo();
 	std::map<std::string, std::vector<ProcessInfo>>& getProcessMap();
-	
+	const HANDLE& getHandle() const;
+	const PROCESSENTRY32& getProcessEntry() const;
 	~HardwareController();
 };
 

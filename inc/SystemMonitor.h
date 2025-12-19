@@ -26,29 +26,12 @@
 class SystemMonitor
 {
 private:
-	// for some reason this solves the crashing when getting cpu usage info
-	//HardwareController hwCtrl; this doesnt work :)
-	//HardwareController* hwCtrl; // this works ?? :)
 	std::unique_ptr<HardwareController> hwCtrl;
-
-	// idk why i put this here maybe itll come back to me
-	//AppConfigController configCtrl; // file saving
-
 	bool vsync;
-
-	/*
-		TODO:
-			Throw these into the hardware controller :3
-	*/
-	// processes
-	HANDLE hSnap;
-	PROCESSENTRY32 pe;
 
 public:
 	SystemMonitor();
 	void render();
-	bool setVsync();
-	const HANDLE& getHandle() const;
-	const PROCESSENTRY32& getProcessEntry() const;
+	bool setVsync() const;
 	~SystemMonitor();
 };

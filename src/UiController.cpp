@@ -206,6 +206,19 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
 void UiController::renderGPU()
 {
     ImGui::Begin("GPU");
+    if (ImPlot::BeginPlot("GPU Usage"))
+    {
+        ImPlot::SetupAxes("Intervals (Every 3s)", "Percent Used");
+        ImPlot::SetupAxisLimits(ImAxis_X1, 0, 10, ImGuiCond_Always);
+        ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
+        //ImPlot::PlotLine("Used", ramHistory.data(), ramHistory.size());
+        ImPlot::EndPlot();
+    }
+    ImGui::Separator();
+    ImGui::Text("VRAM Allocated");
+    ImGui::Text("<put stuff here>");
+    ImGui::Text("<put stuff here>");
+    
     ImGui::End();
 }
 

@@ -138,9 +138,9 @@ void UiController::renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInf
     ImGui::End();
 }
 
-void UiController::renderCPU(const std::atomic<float>& cpuValue, 
-                             const std::array<float, 10>& cpuHistory,
-                             const std::vector<std::array<float, 10>>& coreHistories)
+void UiController::renderCPU(const std::atomic<float>& cpuValue,
+    const std::array<float, 10>& cpuHistory,
+    const std::vector<std::array<float, 10>>& coreHistories)
 {
     ImGui::Begin("CPU");
     if (ImPlot::BeginPlot("CPU Usage"))
@@ -159,20 +159,19 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue,
                 plotCoreType = !plotCoreType;
         }
 
-        // actual display
-        switch (plotCoreType)
+        if (plotCoreType)
         {
-            case true:
-                for (size_t i = 0; i < coreHistories.size(); ++i)
-                {
-                    std::string label = "Core #" + std::to_string(i);
-                    ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
-                }
-                break;
-            case false:
-                for (size_t i = 0; i < coreHistories.size(); ++i)
-                    ImPlot::PlotLine("Total", cpuHistory.data(), cpuHistory.size());
-                break;
+            for (size_t i = 0; i < coreHistories.size(); ++i)
+            {
+                std::string label = "Core #" + std::to_string(i);
+                ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
+                //ImGui::SameLine();
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < coreHistories.size(); ++i)
+                ImPlot::PlotLine("Total", cpuHistory.data(), cpuHistory.size());
         }
         ImPlot::EndPlot();
     }
@@ -182,18 +181,30 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue,
     ImGui::End();
 }
 
-void UiController::renderRAM(const std::atomic<float>& ramValue, 
-                             const std::array<float, 10>& ramHistory, 
-                             const std::atomic<uint64_t>& ramUsed,
-                             const std::atomic<uint64_t>& totalPhysRAM)
+void UiController::renderRAM(const std::atomic<float>& ramValue,
+    const std::array<float, 10>& ramHistory,
+    const std::atomic<uint64_t>& ramUsed,
+    const std::atomic<uint64_t>& totalPhysRAM)
 {
     ImGui::Begin("RAM");
-    if (ImPlot::BeginPlot("RAM Usage"))
+    if (ImPlot::BeginPlot("RAM Usage", ImVec2(300, 300)))
     {
         ImPlot::SetupAxes("Intervals (Every 3s)", "Percent Used");
         ImPlot::SetupAxisLimits(ImAxis_X1, 0, ramHistory.size(), ImGuiCond_Always);
         ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
         ImPlot::PlotLine("Used", ramHistory.data(), ramHistory.size());
+        ImPlot::EndPlot();
+    }
+    ImGui::SameLine();
+    // testing pie chart
+    if (ImPlot::BeginPlot("RAM Usage Pie Chart", ImVec2(250, 250), ImPlotFlags_Equal | ImPlotFlags_NoMouseText))
+    {// cyhange these values eventually
+        static const char* labels1[] = { "Frogs","Hogs","Dogs","Logs" };
+        static float data1[] = { 0.15f,  0.30f,  0.2f, 0.05f };
+        static ImPlotPieChartFlags flags = 0;
+        ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_NoDecorations, ImPlotAxisFlags_NoDecorations);
+        ImPlot::SetupAxesLimits(0, 1, 0, 1);
+        ImPlot::PlotPieChart(labels1, data1, 4, 0.5, 0.5, 0.4, "%.2f", 90, flags);
         ImPlot::EndPlot();
     }
     ImGui::Separator();
@@ -203,6 +214,9 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
     ImGui::End();
 }
 
+// maybe put these as a pie chart 
+// data: 
+//  USED | AVAILABLE | Temperature | latest driver version | DirectX version
 void UiController::renderGPU()
 {
     ImGui::Begin("GPU");
@@ -224,7 +238,10 @@ void UiController::renderGPU()
 
 void UiController::renderNetwork()
 {
+    ImGui::Begin("Network");
 
+
+    ImGui::End();
 }
 
 void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap)

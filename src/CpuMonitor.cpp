@@ -66,9 +66,8 @@ void CpuMonitor::pollCPUMetrics()
                 // total
                 if (PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &v) == ERROR_SUCCESS)
                 {
-                    float total = static_cast<float>(v.doubleValue);
-                    cpuValue.store(total);
-                    cpuHistory[index] = total;
+                    cpuValue.store(static_cast<float>(v.doubleValue));
+                    cpuHistory[index] = static_cast<float>(v.doubleValue);
                 }
 
                 // per core
@@ -76,8 +75,7 @@ void CpuMonitor::pollCPUMetrics()
                 {
                     if (PdhGetFormattedCounterValue(coreCounters[core], PDH_FMT_DOUBLE, nullptr, &v) == ERROR_SUCCESS)
                     {
-                        float val = static_cast<float>(v.doubleValue);
-                        coreHistories[core][index] = val;
+                        coreHistories[core][index] = static_cast<float>(v.doubleValue);
                     }
                 }
 
@@ -149,6 +147,5 @@ const std::vector<std::array<float, 10>>& CpuMonitor::getIndividualCoreHistories
 
 CpuMonitor::~CpuMonitor()
 {
-    // pretty sure this stops it?
     stopPolling();
 }

@@ -9,8 +9,9 @@ HardwareController::HardwareController()
 }
 
 void HardwareController::getCPUInfo()
-{
-    cpuMonitor.pollCPUMetrics();
+{// probably remove all methods and just start up the class monitors
+    // in the constructor
+    cpuMonitor.pollCPUMetrics(); 
 }
 
 void HardwareController::setRAMInfo()
@@ -23,8 +24,8 @@ void HardwareController::setRAMInfo()
             memInfo.dwLength = sizeof(MEMORYSTATUSEX);
             if (GlobalMemoryStatusEx(&memInfo))
             {
-                std::uint64_t total = static_cast<std::uint64_t>(memInfo.ullTotalPhys);
-                std::uint64_t used = total - static_cast<std::uint64_t>(memInfo.ullAvailPhys);
+                uint64_t total = static_cast<uint64_t>(memInfo.ullTotalPhys);
+                uint64_t used = total - static_cast<uint64_t>(memInfo.ullAvailPhys);
 
                 totalPhysRAM.store(total, std::memory_order_relaxed);
                 ramUsed.store(used, std::memory_order_relaxed);

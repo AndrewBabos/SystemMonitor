@@ -22,6 +22,9 @@
 #define thread_Update 450 // 0x1C2 (ms)
 #define length_cpuBrandStr 64 // 0x40 64 bytes length
 
+/* TODO:
+	*		throw this into processes monitor
+	*/
 struct ProcessInfo
 {
 	DWORD pid;
@@ -38,32 +41,28 @@ private:
 	SYSTEM_INFO sysInfo;
 	CpuMonitor cpuMonitor;
 
-	// cpu vars
-	//std::atomic<bool> running = { true };
-	//std::thread cpuThread;
-	//PDH_HQUERY query;
-	//PDH_HCOUNTER counter;
-	//PDH_FMT_COUNTERVALUE counterVal;
-	//std::atomic<float> cpuValue = { 0.0 };
-	//std::array<float, 10> cpuHistory{};
-	//uint8_t index = 0;
-
 //	Mike Topp
 
 	// processes list
+	/* TODO:
+	*		throw this into its own monitor
+	*/
 	HANDLE hSnap;
 	PROCESSENTRY32 pe;
 	std::thread processesThread;
 	std::map<std::string, std::vector<ProcessInfo>> processMap;
 
+
 	// ram memory
+	/* TODO:
+	*		throw this into its own monitor
+	*/
 	std::thread ramThread;
 	MEMORYSTATUSEX memInfo;
 	std::atomic<bool> ramRunning{ true };
 	std::array<float, 10> ramHistory{};
 	std::atomic<float> ramValue; // percent
 	std::atomic<uint64_t> ramUsed, totalPhysRAM{0};
-
 	uint8_t ramIndex = 0;
 
 	// glfw
@@ -71,7 +70,6 @@ private:
 
 public:
 	HardwareController();
-
 
 	// CpuMonitor class
 	void getCPUInfo();

@@ -57,6 +57,7 @@ target_include_directories(SystemMonitor PRIVATE
     ${CMAKE_SOURCE_DIR}/inc
     ${CMAKE_SOURCE_DIR}/external/glad/include
     ${CMAKE_SOURCE_DIR}/external/glfw/include
+    ${CMAKE_SOURCE_DIR}/external/adlx/SDK/include
     ${IMGUI_DIR}
 )
 

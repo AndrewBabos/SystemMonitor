@@ -10,11 +10,10 @@
 #include "../inc/SystemMonitor.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-//void processInput(GLFWwindow* window);
 
 // settings
-const unsigned int SCR_WIDTH = 1536;
-const unsigned int SCR_HEIGHT = 864;
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
 
 int main()
 {
@@ -124,13 +123,6 @@ int main()
     glfwTerminate();
     return 0;
 }
-
-//void processInput(GLFWwindow* window)
-//{
-//    /*if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-//        glfwSetWindowShouldClose(window, true);*/
-//}
-
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {

@@ -139,39 +139,22 @@ void UiController::renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInf
 }
 
 void UiController::renderCPU(const std::atomic<float>& cpuValue,
-    const std::array<float, 10>& cpuHistory,
-    const std::vector<std::array<float, 10>>& coreHistories)
+                             const std::array<float, 10>& cpuHistory,
+                             const std::vector<std::array<float, 10>>& coreHistories)
 {
+    // TODO:
+    // remove the button function its gross
+    // 2 graphs, 1 total 1 for indidual cores :D
     ImGui::Begin("CPU");
     if (ImPlot::BeginPlot("CPU Usage"))
     {
         ImPlot::SetupAxes("Intervals (Every 450ms)", "Percent Used");
         ImPlot::SetupAxisLimits(ImAxis_X1, 0, cpuHistory.size(), ImGuiCond_Always);
         ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
-        if (plotCoreType)
+        for (size_t i = 0; i < coreHistories.size(); ++i)
         {
-            if (ImGui::Button("Total Cores"))
-                plotCoreType = !plotCoreType;
-        }
-        else
-        {
-            if (ImGui::Button("Individual Cores"))
-                plotCoreType = !plotCoreType;
-        }
-
-        if (plotCoreType)
-        {
-            for (size_t i = 0; i < coreHistories.size(); ++i)
-            {
-                std::string label = "Core #" + std::to_string(i);
-                ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
-                //ImGui::SameLine();
-            }
-        }
-        else
-        {
-            for (size_t i = 0; i < coreHistories.size(); ++i)
-                ImPlot::PlotLine("Total", cpuHistory.data(), cpuHistory.size());
+            std::string label = "Core #" + std::to_string(i);
+            ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
         }
         ImPlot::EndPlot();
     }

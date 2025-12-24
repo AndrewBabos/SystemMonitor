@@ -16,16 +16,14 @@
 //#include <Psapi.h>
 //#pragma comment(lib, "psapi.lib")
 
-enum class UiStates
-{
-	Idle,
-	MenuOptions
-};
+//enum class UiStates
+//{
+//	Idle,
+//	MenuOptions
+//};
 
 namespace UiController
 {
-	static bool plotCoreType = true; // false = total | true = individual
-
 	void renderOptionsAndDockspace();
 	void renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInfo);
 

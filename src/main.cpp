@@ -51,8 +51,6 @@ int main()
     ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
@@ -68,7 +66,6 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    //SystemMonitor* p_sysMon = new SystemMonitor();
     SystemMonitor sysMon;
     const double fpsTarget = 120.0;
     const double frameTimeMS = 1000.0 / fpsTarget;
@@ -85,9 +82,9 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // my code
-        //p_sysMon->RenderUi();
+
         sysMon.render();
+
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -108,7 +105,6 @@ int main()
         if (elapsedTime.count() < frameTimeMS)
             std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(frameTimeMS - elapsedTime.count()));
 
-        //processInput(window);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -117,7 +113,6 @@ int main()
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
     ImPlot::DestroyContext();
-    //delete p_sysMon;
 
     glfwDestroyWindow(window);
     glfwTerminate();
@@ -126,7 +121,5 @@ int main()
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }

@@ -132,6 +132,8 @@ void UiController::renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInf
 {
     ImGui::Begin("System Information");
     ImGui::Text("Processor:          %s", CPUBrandString.c_str());
+    //ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
+    ImGui::Text("CPU Clock Frequency: <work in progress>");
     ImGui::Text("Number of Cores:   %d", sysInfo.dwNumberOfProcessors);
     ImGui::Text("Processor Architecture:   %d", sysInfo.wProcessorArchitecture);
     ImGui::Separator();
@@ -145,8 +147,9 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue,
     // TODO:
     // remove the button function its gross
     // 2 graphs, 1 total 1 for indidual cores :D
+    
     ImGui::Begin("CPU");
-    if (ImPlot::BeginPlot("CPU Usage"))
+    if (ImPlot::BeginPlot("Individual Cores"))
     {
         ImPlot::SetupAxes("Intervals (Every 450ms)", "Percent Used");
         ImPlot::SetupAxisLimits(ImAxis_X1, 0, cpuHistory.size(), ImGuiCond_Always);
@@ -158,16 +161,28 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue,
         }
         ImPlot::EndPlot();
     }
+    //ImGui::SameLine();
+    if (ImPlot::BeginPlot("Total Core Usage"))
+    {
+        ImPlot::SetupAxes("Intervals (Every 450ms)", "Percent Used");
+        ImPlot::SetupAxisLimits(ImAxis_X1, 0, cpuHistory.size(), ImGuiCond_Always);
+        ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
+        for (size_t i = 0; i < coreHistories.size(); ++i)
+        {
+            //std::string label = "Core #" + std::to_string(i);
+            ImPlot::PlotLine("Total Usage", cpuHistory.data(), cpuHistory.size());
+        }
+        ImPlot::EndPlot();
+    }
     ImGui::Separator();
     ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
-    ImGui::Text("CPU Clock Frequency: <work in progress>");
     ImGui::End();
 }
 
 void UiController::renderRAM(const std::atomic<float>& ramValue,
-    const std::array<float, 10>& ramHistory,
-    const std::atomic<uint64_t>& ramUsed,
-    const std::atomic<uint64_t>& totalPhysRAM)
+                             const std::array<float, 10>& ramHistory,
+                             const std::atomic<uint64_t>& ramUsed,
+                             const std::atomic<uint64_t>& totalPhysRAM)
 {
     ImGui::Begin("RAM");
     if (ImPlot::BeginPlot("RAM Usage", ImVec2(300, 300)))
@@ -180,16 +195,14 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
     }
     ImGui::SameLine();
     // testing pie chart
-    if (ImPlot::BeginPlot("RAM Usage Pie Chart", ImVec2(250, 250), ImPlotFlags_Equal | ImPlotFlags_NoMouseText))
-    {// cyhange these values eventually
-        static const char* labels1[] = { "Frogs","Hogs","Dogs","Logs" };
-        static float data1[] = { 0.15f,  0.30f,  0.2f, 0.05f };
-        static ImPlotPieChartFlags flags = 0;
-        ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_NoDecorations, ImPlotAxisFlags_NoDecorations);
-        ImPlot::SetupAxesLimits(0, 1, 0, 1);
-        ImPlot::PlotPieChart(labels1, data1, 4, 0.5, 0.5, 0.4, "%.2f", 90, flags);
-        ImPlot::EndPlot();
-    }
+    //if (ImPlot::BeginPlot("RAM Usage Pie Chart", ImVec2(250, 250), ImPlotFlags_Equal | ImPlotFlags_NoMouseText))
+    //{// cyhange these values eventually
+    //    static ImPlotPieChartFlags flags = 0;
+    //    ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_NoDecorations, ImPlotAxisFlags_NoDecorations);
+    //    ImPlot::SetupAxesLimits(0, 1, 0, 1);
+    //    ImPlot::PlotPieChart("RAM Usage", ramHistory.data(), 4, 0.5, 0.5, 0.4, "%.2f", 90, flags);
+    //    ImPlot::EndPlot();
+    //}
     ImGui::Separator();
     ImGui::Text("%.0fMB installed", (double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024));
     ImGui::Text("%.0fMB used", (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024));
@@ -230,7 +243,6 @@ void UiController::renderNetwork()
 void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap)
 {
     ImGui::Begin("Processes");
-    //getProcessesInfo();
     static ImGuiTableFlags flags =
         ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti
         | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_NoBordersInBody

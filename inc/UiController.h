@@ -40,6 +40,8 @@ namespace UiController
 
 	void renderNetwork();
 
+	static bool isSelected = false;
+	static uint16_t selectedIndex = -1;
 	void renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap);
 	
 };

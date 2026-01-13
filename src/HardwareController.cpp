@@ -10,7 +10,6 @@ HardwareController::HardwareController()
 
 void HardwareController::getCPUInfo()
 {// probably remove all methods and just start up the class monitors
-    // in the constructor
     cpuMonitor.pollCPUMetrics(); 
 }
 

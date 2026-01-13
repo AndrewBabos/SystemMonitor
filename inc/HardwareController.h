@@ -35,6 +35,8 @@ struct ProcessInfo
 	float networkUsage;
 };
 
+// probably dont need this, class into class into class just makes it
+// redundant. SystemMonitor Class seems like HwCtrl anyway
 class HardwareController
 {
 private:

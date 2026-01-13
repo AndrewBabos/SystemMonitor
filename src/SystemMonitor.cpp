@@ -29,8 +29,8 @@ void SystemMonitor::render()
                                     hwCtrl->getRAMHistory(),
                                     hwCtrl->getUsedRAM(),
                                     hwCtrl->getTotalPhysRAM());
-    UiController::renderGPU         (    ); // put stuff ehre
-    UiController::renderSysInfo  (  hwCtrl->getCPUBrandStr(), 
+    UiController::renderGPU(                                ); // put stuff ehre
+    UiController::renderSysInfo(    hwCtrl->getCPUBrandStr(), 
                                     hwCtrl->getSysInfo());
     UiController::renderProcesses(  hwCtrl->getHandle(),
                                     hwCtrl->getProcessEntry(),
@@ -61,8 +61,4 @@ bool SystemMonitor::setVsync() const
 
 SystemMonitor::~SystemMonitor()
 {
-    //CloseHandle(hSnap);
-    // pretty sure trying to stop a thread makes it crash
-    // its a unique pointer so no need for delete
-    //delete hwCtrl; // dont know why this crashes
 }

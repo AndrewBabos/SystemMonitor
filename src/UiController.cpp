@@ -260,8 +260,10 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
         ImGui::TableSetupScrollFreeze(0, 1); // set always visible
         ImGui::TableHeadersRow();
 
-        static int selectedIndex, index = -1;
-        //bool isSelected = false; // start on false, will be used eventually
+        // temps
+        uint8_t id = 0;
+
+
         for (auto iterator = processMap.begin(); iterator != processMap.end(); ++iterator)
         {
             const std::string& processName = iterator->first; // might not need this
@@ -280,13 +282,24 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
                     {
                         ImGui::TableNextRow();
                         ImGui::TableSetColumnIndex(0);
-
+                        ImGui::PushID(id);
                         char pidStr[16];
                         _ultoa_s(process.pid, pidStr, sizeof(pidStr), 10);
-                        ImGui::Text(pidStr);
+                        if (ImGui::Selectable(pidStr, selectedIndex == id))
+                        {
+                            selectedIndex = id;
+                            isSelected = !isSelected;
+                        }
+                        //ImGui::Text(pidStr);
 
                         ImGui::TableSetColumnIndex(1);
-                        ImGui::Text("     %s", processName.c_str());
+                        if (ImGui::Selectable(processName.c_str(), selectedIndex == id))
+                        {
+                            selectedIndex = id;
+                            isSelected = !isSelected;
+                        }
+
+                        //ImGui::Text("     %s", processName.c_str());
 
                         ImGui::TableSetColumnIndex(2);
                         ImGui::Text("%d", process.cpuUsage);
@@ -299,22 +312,39 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
 
                         ImGui::TableSetColumnIndex(5);
                         ImGui::Text("%d", process.networkUsage);
+
+                        //ImGui::PushID(id);
+                        id++;
                     }
+                    for (const ProcessInfo& process : processList)
+                        ImGui::PopID();
+
                     ImGui::TreePop();
                 }
             }
             else
             {
+                ImGui::PushID(id);
                 const ProcessInfo& process = processList.front();
                 char pidStr[12];
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
                 _ultoa_s(process.pid, pidStr, sizeof(pidStr), 10);
-                ImGui::Text(pidStr);
+                //ImGui::Text(pidStr);
+
+                if (ImGui::Selectable(pidStr, selectedIndex == id))
+                {
+                    selectedIndex = id;
+                    isSelected = !isSelected;
+                }
 
                 ImGui::TableSetColumnIndex(1);
                 //ImGui::Text("   %s", processName.c_str());
-                ImGui::Text("%s", processName.c_str());
+                if (ImGui::Selectable(processName.c_str(), selectedIndex == id))
+                {
+                    selectedIndex = id;
+                    isSelected = !isSelected;
+                }
 
                 ImGui::TableSetColumnIndex(2);
                 ImGui::Text("%d", process.cpuUsage);
@@ -328,12 +358,13 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
                 ImGui::TableSetColumnIndex(5);
                 ImGui::Text("%zu", process.networkUsage);
 
+                id++;
+                ImGui::PopID();
             }
         }
-
         ImGui::EndTable();
 
         if (ImGui::Button("End Task"))
-            std::cout << "ended task\n";
+            std::cout << "Selected Process: " << "";
     }
 }

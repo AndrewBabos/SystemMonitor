@@ -262,7 +262,8 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
 
         // temps
         uint8_t id = 0;
-
+        /*std::string nameTemp = "";
+        char pidTempStr[16]{};*/
 
         for (auto iterator = processMap.begin(); iterator != processMap.end(); ++iterator)
         {
@@ -289,6 +290,9 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
                         {
                             selectedIndex = id;
                             isSelected = !isSelected;
+                            //_ultoa_s(process.pid, pidTempStr, sizeof(pidTempStr), 10);
+                            pidTemp = process.pid;
+                            nameTemp = processName;
                         }
                         //ImGui::Text(pidStr);
 
@@ -297,6 +301,9 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
                         {
                             selectedIndex = id;
                             isSelected = !isSelected;
+                            //_ultoa_s(process.pid, pidTempStr, sizeof(pidTempStr), 10);
+                            pidTemp = process.pid;
+                            nameTemp = processName;
                         }
 
                         //ImGui::Text("     %s", processName.c_str());
@@ -336,6 +343,8 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
                 {
                     selectedIndex = id;
                     isSelected = !isSelected;
+                    pidTemp = process.pid;
+                    nameTemp = processName;
                 }
 
                 ImGui::TableSetColumnIndex(1);
@@ -344,6 +353,8 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
                 {
                     selectedIndex = id;
                     isSelected = !isSelected;
+                    pidTemp = process.pid;
+                    nameTemp = processName;
                 }
 
                 ImGui::TableSetColumnIndex(2);
@@ -365,6 +376,13 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
         ImGui::EndTable();
 
         if (ImGui::Button("End Task"))
-            std::cout << "Selected Process: " << "";
+        {
+            std::cout << "Selected Process: " << nameTemp << std::endl;
+            std::cout << "PID: " << pidTemp << std::endl;
+            HANDLE h = OpenProcess(PROCESS_TERMINATE, FALSE, pidTemp);
+            if (!h) return;
+            TerminateProcess(h, 1);
+            CloseHandle(h);
+        }
     }
 }

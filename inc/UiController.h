@@ -24,6 +24,13 @@
 
 namespace UiController
 {
+	// let me cook
+	static bool isSelected = false;
+	static uint16_t selectedIndex = -1;
+	static std::string nameTemp = "";
+	//static char pidTempStr[16]{};
+	static DWORD pidTemp;
+
 	void renderOptionsAndDockspace();
 	void renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInfo);
 
@@ -39,10 +46,6 @@ namespace UiController
 	void renderGPU();
 
 	void renderNetwork();
-
-	static bool isSelected = false;
-	static uint16_t selectedIndex = -1;
 	void renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap);
-	
 };
 

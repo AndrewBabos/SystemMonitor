@@ -262,8 +262,6 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
 
         // temps
         uint8_t id = 0;
-        /*std::string nameTemp = "";
-        char pidTempStr[16]{};*/
 
         for (auto iterator = processMap.begin(); iterator != processMap.end(); ++iterator)
         {
@@ -305,7 +303,6 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
                             pidTemp = process.pid;
                             nameTemp = processName;
                         }
-
                         //ImGui::Text("     %s", processName.c_str());
 
                         ImGui::TableSetColumnIndex(2);
@@ -374,15 +371,51 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
             }
         }
         ImGui::EndTable();
-
+        if (ImGui::Button("Properties"))
+            UiController::openPropertiesTab(pidTemp);
+        ImGui::SameLine();
         if (ImGui::Button("End Task"))
-        {
-            std::cout << "Selected Process: " << nameTemp << std::endl;
-            std::cout << "PID: " << pidTemp << std::endl;
-            HANDLE h = OpenProcess(PROCESS_TERMINATE, FALSE, pidTemp);
-            if (!h) return;
-            TerminateProcess(h, 1);
-            CloseHandle(h);
-        }
+            UiController::endProcessTask(pidTemp);
+        
     }
+}
+
+
+void UiController::openPropertiesTab(DWORD pid)
+{
+    HANDLE handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pidTemp);
+    if (!handle) return;
+
+    char path[MAX_PATH];
+    DWORD size = MAX_PATH;
+    std::cout << "opening properties tab of : " << nameTemp << std::endl;
+    if (QueryFullProcessImageNameA(handle, 0, path, &size))
+    {
+        SHELLEXECUTEINFOA shellExeInfo = {};
+        shellExeInfo.cbSize = sizeof(SHELLEXECUTEINFOA);
+        shellExeInfo.fMask = SEE_MASK_INVOKEIDLIST;
+        shellExeInfo.lpFile = path;
+        std::cout << shellExeInfo.lpFile << std::endl;
+        shellExeInfo.nShow = SW_SHOW;
+        shellExeInfo.lpVerb = "properties";
+        ShellExecuteEx(&shellExeInfo);
+    }
+    else
+    {
+        std::cout << "error opening: " << nameTemp << std::endl;
+        CloseHandle(handle);
+        return;
+    }
+    std::cout << "opened properties tab of : " << nameTemp << std::endl;
+    CloseHandle(handle);
+}
+
+void UiController::endProcessTask(DWORD pid)
+{
+    std::cout << "Selected Process: " << nameTemp << std::endl;
+    std::cout << "PID: " << pidTemp << std::endl;
+    HANDLE handle = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+    if (!handle) return;
+    TerminateProcess(handle, 1);
+    CloseHandle(handle);
 }

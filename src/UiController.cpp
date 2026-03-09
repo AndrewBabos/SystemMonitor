@@ -144,36 +144,59 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue,
                              const std::array<float, 10>& cpuHistory,
                              const std::vector<std::array<float, 10>>& coreHistories)
 {
-    // TODO:
-    // remove the button function its gross
-    // 2 graphs, 1 total 1 for indidual cores :D
-    
     ImGui::Begin("CPU");
-    if (ImPlot::BeginPlot("Individual Cores"))
+    ImGui::Text("Individual Cores");
+    uint8_t columns = 2;
+    uint8_t numCores = coreHistories.size();
+    ImVec4 color;
+
+    for (size_t i = 0; i < numCores; i++)
     {
-        ImPlot::SetupAxes("Intervals (Every 450ms)", "Percent Used");
-        ImPlot::SetupAxisLimits(ImAxis_X1, 0, cpuHistory.size(), ImGuiCond_Always);
-        ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
-        for (size_t i = 0; i < coreHistories.size(); ++i)
+        ImGui::PushID(i);
+        ImGui::BeginGroup();
+        //ImGui::Text("Core %2d", i);
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Core %2d", i); // Bright white
+        ImGui::SameLine();
+
+        // depending on USAGE, the color cycles
+        color = coreHistories[i][9] < 50 ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f):  // GREEN
+                coreHistories[i][9] < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f):  // YELLOW
+                                           ImVec4(0.9f, 0.2f, 0.2f, 1.0f);  // RED
+
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+        ImGui::ProgressBar(coreHistories[i][9] / 100.0f, ImVec2(200.0f, 20.0f), "");
+        ImGui::PopStyleColor(2);
+
+        // Percentage text
         {
-            std::string label = "Core #" + std::to_string(i);
-            ImPlot::PlotLine(label.c_str(), coreHistories[i].data(), coreHistories[i].size());
+            ImGui::SameLine();
+            ImGui::Text("%5.1f%%", coreHistories[i][9]);
+            ImGui::EndGroup();
+            ImGui::PopID();
         }
-        ImPlot::EndPlot();
+
+        // Create 2-column layout
+        if ((i + 1) % columns != 0 && i < numCores - 1)
+        {
+            ImGui::SameLine();
+            ImGui::Spacing();
+            ImGui::SameLine();
+        }
     }
-    //ImGui::SameLine();
+
+    ImGui::BeginChild("CPU Line graph");
+    // simple line graph
     if (ImPlot::BeginPlot("Total Core Usage"))
     {
         ImPlot::SetupAxes("Intervals (Every 450ms)", "Percent Used");
         ImPlot::SetupAxisLimits(ImAxis_X1, 0, cpuHistory.size(), ImGuiCond_Always);
         ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
         for (size_t i = 0; i < coreHistories.size(); ++i)
-        {
-            //std::string label = "Core #" + std::to_string(i);
             ImPlot::PlotLine("Total Usage", cpuHistory.data(), cpuHistory.size());
-        }
         ImPlot::EndPlot();
     }
+    ImGui::EndChild();
     ImGui::Separator();
     ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
     ImGui::End();

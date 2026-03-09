@@ -45,9 +45,13 @@ namespace UiController
 				   const std::atomic<uint64_t>& totalPhysRAM);
 	void renderGPU();
 	void renderNetwork();
-	void renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe, const std::map<std::string, std::vector<ProcessInfo>> processMap);
+	void renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe,
+						 const std::map<std::string,
+						 std::vector<ProcessInfo>> processMap);
 	////////////////////////////////////////////////////////
 
+
+	// TODO LOOK AT THE PARAMETERS
 	// logic functions
 	void openPropertiesTab(DWORD pid); // might not need parameter
 	void endProcessTask(DWORD pid);// might not need parameter

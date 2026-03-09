@@ -29,7 +29,7 @@ void SystemMonitor::render()
                                     hwCtrl->getRAMHistory(),
                                     hwCtrl->getUsedRAM(),
                                     hwCtrl->getTotalPhysRAM());
-    UiController::renderGPU(                                ); // put stuff ehre
+    //UiController::renderGPU(                                ); // put stuff ehre
     UiController::renderSysInfo(    hwCtrl->getCPUBrandStr(), 
                                     hwCtrl->getSysInfo());
     UiController::renderProcesses(  hwCtrl->getHandle(),
@@ -38,7 +38,7 @@ void SystemMonitor::render()
 
 
     // references to their docs
-    //ImGui::ShowDemoWindow();
+    ImGui::ShowDemoWindow();
     //ImPlot::ShowDemoWindow();
 
 	ImGui::End();

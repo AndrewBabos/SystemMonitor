@@ -54,7 +54,7 @@ void CpuMonitor::pollCPUMetrics()
     cpuThread = std::thread([this, coreCount]()
         {
             PdhCollectQueryData(query);
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            //std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
             while (running.load(std::memory_order_relaxed))
             {
@@ -71,12 +71,10 @@ void CpuMonitor::pollCPUMetrics()
                 }
 
                 // per core
-                for (uint8_t core = 0; core < coreCount; ++core)
+                for (size_t core = 0; core < coreCount; ++core)
                 {
                     if (PdhGetFormattedCounterValue(coreCounters[core], PDH_FMT_DOUBLE, nullptr, &v) == ERROR_SUCCESS)
-                    {
                         coreHistories[core][index] = static_cast<float>(v.doubleValue);
-                    }
                 }
 
                 index = (index + 1) % cpuHistory.size();

@@ -31,6 +31,9 @@ namespace UiController
 	static std::string nameTemp = "";
 	//static char pidTempStr[16]{};
 	static DWORD pidTemp;
+	static uint8_t columns = 2;
+	static ImVec4 color;
+	static float coreUsage = 0.0f;
 
 	/////////////////////////////////////////////////////////
 	// actual renderers

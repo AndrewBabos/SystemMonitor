@@ -45,6 +45,8 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+    std::cout << glGetString(GL_VENDOR) << std::endl;
+    std::cout << glGetString(GL_RENDERER) << std::endl;
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();

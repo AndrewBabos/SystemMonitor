@@ -145,10 +145,23 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
                              const std::vector<std::array<float, 10>>& coreHistories) // individual cores
 {
     ImGui::Begin("CPU");
-    ImGui::Text("Individual Cores");
-    //uint8_t columns = 2;
     uint8_t numCores = coreHistories.size();
+    std::string percentBuffer = std::to_string(cpuValue.load()) + "%";
+    color2 = cpuValue.load() < 50 ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f) :  // GREEN
+        cpuValue.load() < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f) :  // YELLOW
+        ImVec4(0.9f, 0.2f, 0.2f, 1.0f);  // RED
 
+    ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color2);
+    ImGui::ProgressBar(cpuValue.load() / 100.0f, ImVec2(200.0f, 20.0f), percentBuffer.c_str());
+    //ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+    ImGui::PopStyleColor();
+
+    ////////////////////
+    ImGui::Separator();
+    ////////////////////
+
+    ImGui::BeginChild("Grid-View");
+    ImGui::Text("Individual Cores");
     for (size_t i = 0; i < numCores; i++)
     {
         ImGui::PushID(i);
@@ -158,14 +171,14 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
 
         // depending on USAGE, the color cycles
         coreUsage = coreHistories[i][9];
-        color = coreUsage < 50 ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f):  // GREEN
-                coreUsage < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f):  // YELLOW
-                                 ImVec4(0.9f, 0.2f, 0.2f, 1.0f);  // RED
+        color = coreUsage < 50 ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f) :  // GREEN
+            coreUsage < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f) :  // YELLOW
+            ImVec4(0.9f, 0.2f, 0.2f, 1.0f);  // RED
 
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+        //ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
         ImGui::ProgressBar(coreUsage / 100.0f, ImVec2(200.0f, 20.0f), "");
-        ImGui::PopStyleColor(2);
+        ImGui::PopStyleColor();
 
         // Percentage text
         {
@@ -183,21 +196,8 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
             ImGui::SameLine();
         }
     }
-    
-    ImGui::BeginChild("CPU Line graph");
-    // simple line graph
-    if (ImPlot::BeginPlot("Total Core Usage"))
-    {
-        ImPlot::SetupAxes("Intervals (Every 450ms)", "Percent Used");
-        ImPlot::SetupAxisLimits(ImAxis_X1, 0, cpuHistory.size(), ImGuiCond_Always);
-        ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
-        for (size_t i = 0; i < numCores; ++i)
-            ImPlot::PlotLine("Total Usage", cpuHistory.data(), cpuHistory.size());
-        ImPlot::EndPlot();
-    }
     ImGui::EndChild();
     ImGui::Separator();
-    ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
     ImGui::End();
 }
 
@@ -216,15 +216,6 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
         ImPlot::EndPlot();
     }
     ImGui::SameLine();
-    // testing pie chart
-    //if (ImPlot::BeginPlot("RAM Usage Pie Chart", ImVec2(250, 250), ImPlotFlags_Equal | ImPlotFlags_NoMouseText))
-    //{// cyhange these values eventually
-    //    static ImPlotPieChartFlags flags = 0;
-    //    ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_NoDecorations, ImPlotAxisFlags_NoDecorations);
-    //    ImPlot::SetupAxesLimits(0, 1, 0, 1);
-    //    ImPlot::PlotPieChart("RAM Usage", ramHistory.data(), 4, 0.5, 0.5, 0.4, "%.2f", 90, flags);
-    //    ImPlot::EndPlot();
-    //}
     ImGui::Separator();
     ImGui::Text("%.0fMB installed", (double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024));
     ImGui::Text("%.0fMB used", (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024));
@@ -257,8 +248,14 @@ void UiController::renderGPU()
 void UiController::renderNetwork()
 {
     ImGui::Begin("Network");
-
-
+    if (ImPlot::BeginPlot("Network Usage"))
+    {
+        ImPlot::SetupAxes("Intervals (Every 3s)", "Percent Used");
+        ImPlot::SetupAxisLimits(ImAxis_X1, 0, 10, ImGuiCond_Always);
+        ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100, ImGuiCond_Always);
+        //ImPlot::PlotLine("Used", ramHistory.data(), ramHistory.size());
+        ImPlot::EndPlot();
+    }
     ImGui::End();
 }
 

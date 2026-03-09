@@ -29,7 +29,8 @@ void SystemMonitor::render()
                                     hwCtrl->getRAMHistory(),
                                     hwCtrl->getUsedRAM(),
                                     hwCtrl->getTotalPhysRAM());
-    //UiController::renderGPU(                                ); // put stuff ehre
+    UiController::renderGPU(                                ); // put stuff ehre
+    UiController::renderNetwork();
     UiController::renderSysInfo(    hwCtrl->getCPUBrandStr(), 
                                     hwCtrl->getSysInfo());
     UiController::renderProcesses(  hwCtrl->getHandle(),

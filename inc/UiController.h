@@ -33,6 +33,7 @@ namespace UiController
 	static DWORD pidTemp;
 	static uint8_t columns = 2;
 	static ImVec4 color;
+	static ImVec4 color2;
 	static float coreUsage = 0.0f;
 
 	/////////////////////////////////////////////////////////

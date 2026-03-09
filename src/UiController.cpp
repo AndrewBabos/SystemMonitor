@@ -151,7 +151,8 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
         cpuValue.load() < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f) :  // YELLOW
         ImVec4(0.9f, 0.2f, 0.2f, 1.0f);  // RED
 
-    ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color2);
+    ImGui::Text("Total CPU Usage"); ImGui::SameLine();
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color2);
     ImGui::ProgressBar(cpuValue.load() / 100.0f, ImVec2(200.0f, 20.0f), percentBuffer.c_str());
     //ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
     ImGui::PopStyleColor();

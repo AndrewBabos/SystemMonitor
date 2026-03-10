@@ -157,11 +157,6 @@ HRESULT CpuMonitor::SetCpuTemperature(LPLONG pTemperature)
     return hr;
 }
 
-LONG& CpuMonitor::getCpuTemperature()
-{
-    return cpuTemp;
-}
-
 const std::string CpuMonitor::getCPUStr() const
 {
     char CPUBrandString[64] = "";

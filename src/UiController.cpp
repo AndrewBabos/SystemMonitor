@@ -180,9 +180,9 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
         coreUsage = coreHistories[i][0];
         averageCoreUsage = std::accumulate(coreHistories[i].begin(), coreHistories[i].end(), 0.0f) / 10.0f;
         
-        color = coreUsage < 50 ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f) :  // GREEN
-            coreUsage < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f) :  // YELLOW
-            ImVec4(0.9f, 0.2f, 0.2f, 1.0f);  // RED
+        color = averageCoreUsage < 50 ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f) :  // GREEN
+                averageCoreUsage < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f) :  // YELLOW
+                                        ImVec4(0.9f, 0.2f, 0.2f, 1.0f);  // RED
 
         ImGui::PushStyleColor(ImGuiCol_PlotLines, color);
         ImGui::PlotLines("##history",
@@ -413,16 +413,17 @@ void UiController::renderProcesses(const HANDLE& hSnap, const PROCESSENTRY32& pe
         }
         ImGui::EndTable();
         if (ImGui::Button("Properties"))
-            UiController::openPropertiesTab(pidTemp);
+            UiController::openPropertiesTab();
         ImGui::SameLine();
         if (ImGui::Button("End Task"))
-            UiController::endProcessTask(pidTemp);
+            UiController::endProcessTask();
         
     }
 }
 
 
-void UiController::openPropertiesTab(DWORD pid)
+//void UiController::openPropertiesTab(DWORD pid)
+void UiController::openPropertiesTab()
 {
     HANDLE handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pidTemp);
     if (!handle) return;
@@ -451,11 +452,11 @@ void UiController::openPropertiesTab(DWORD pid)
     CloseHandle(handle);
 }
 
-void UiController::endProcessTask(DWORD pid)
+void UiController::endProcessTask()
 {
     std::cout << "Selected Process: " << nameTemp << std::endl;
     std::cout << "PID: " << pidTemp << std::endl;
-    HANDLE handle = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+    HANDLE handle = OpenProcess(PROCESS_TERMINATE, FALSE, pidTemp);
     if (!handle) return;
     TerminateProcess(handle, 1);
     CloseHandle(handle);

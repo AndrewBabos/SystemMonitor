@@ -43,8 +43,8 @@ namespace UiController
 	void renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInfo);
 
 	void renderCPU(const std::atomic<float>& cpuValue,
-					const std::array<float, 10>& cpuHistory,
-					const std::vector<std::array<float, 10>>& coreHistories);
+				   const std::array<float, 10>& cpuHistory,
+				   const std::vector<std::array<float, 10>>& coreHistories);
 
 	void renderRAM(const std::atomic<float>& ramValue,
 				   const std::array<float, 10>& ramHistory,
@@ -60,7 +60,9 @@ namespace UiController
 
 	// TODO LOOK AT THE PARAMETERS
 	// logic functions
-	void openPropertiesTab(DWORD pid); // might not need parameter
-	void endProcessTask(DWORD pid);// might not need parameter
+	//void openPropertiesTab(DWORD pid); // might not need parameter
+	void openPropertiesTab(); // might not need parameter
+	//void endProcessTask(DWORD pid);// might not need parameter
+	void endProcessTask();// might not need parameter
 };
 

@@ -42,7 +42,6 @@ public:
 	void pollCPUMetrics();
 	void stopPolling();
 	HRESULT SetCpuTemperature(LPLONG pTemperature);
-	LONG& getCpuTemperature();
 	const std::string getCPUStr() const;
 	const std::atomic<float>& getCPUValue() const;
 	const std::array<float, 10>& getCPUMetrics() const;

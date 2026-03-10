@@ -73,11 +73,6 @@ const std::vector<std::array<float, 10>>& HardwareController::getIndividualCoreH
     return cpuMonitor.getIndividualCoreHistories();
 }
 
-LONG HardwareController::getCPUTemperature()
-{
-    return cpuMonitor.getCpuTemperature();
-}
-
 void HardwareController::getProcessesInfo()
 {
     if (hSnap == INVALID_HANDLE_VALUE)

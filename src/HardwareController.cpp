@@ -118,8 +118,12 @@ const PROCESSENTRY32& HardwareController::getProcessEntry() const
 
 HardwareController::~HardwareController()
 {
+    printf("shutting down CpuMonitor\n");
     cpuMonitor.stopPolling();
+    printf("CpuMonitor shut down...\n");
+    printf("shutting down RamMonitor\n");
     ramMonitor.stopPolling();
+    printf("RamMonitor shut down...\n");
 
     if (hSnap != INVALID_HANDLE_VALUE)
         CloseHandle(hSnap);

@@ -1,6 +1,7 @@
 #include "../inc/UiController.h"
 #include <Psapi.h>
 #include "../inc/HardwareController.h"
+#include <numeric>
 #pragma comment(lib, "psapi.lib")
 
 
@@ -140,16 +141,18 @@ void UiController::renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInf
     ImGui::End();
 }
 
+
+
 void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core usage
                              const std::array<float, 10>& cpuHistory, // total core usage over 10 checks
-                             const std::vector<std::array<float, 10>>& coreHistories) // individual cores
+                             const std::vector<std::array<float, 10>>& coreHistories) // individual cores)
 {
     ImGui::Begin("CPU");
     uint8_t numCores = coreHistories.size();
     std::string percentBuffer = std::to_string(cpuValue.load()) + "%";
-    color2 = cpuValue.load() < 50 ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f) :  // GREEN
-        cpuValue.load() < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f) :  // YELLOW
-        ImVec4(0.9f, 0.2f, 0.2f, 1.0f);  // RED
+    color2 =    cpuValue.load() < 50 ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f) :  // GREEN
+                cpuValue.load() < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f) :  // YELLOW
+                                       ImVec4(0.9f, 0.2f, 0.2f, 1.0f);  // RED
 
     ImGui::Text("Total CPU Usage"); ImGui::SameLine();
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color2);
@@ -161,8 +164,11 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
     ImGui::Separator();
     ////////////////////
 
+    // TODO:
+    // figure out why the grid is updating so slow
     ImGui::BeginChild("Grid-View");
     ImGui::Text("Individual Cores");
+
     for (size_t i = 0; i < numCores; i++)
     {
         ImGui::PushID(i);
@@ -171,23 +177,40 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
         ImGui::SameLine();
 
         // depending on USAGE, the color cycles
-        coreUsage = coreHistories[i][9];
+        coreUsage = coreHistories[i][0];
+        averageCoreUsage = std::accumulate(coreHistories[i].begin(), coreHistories[i].end(), 0.0f) / 10.0f;
+        
         color = coreUsage < 50 ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f) :  // GREEN
             coreUsage < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f) :  // YELLOW
             ImVec4(0.9f, 0.2f, 0.2f, 1.0f);  // RED
 
-        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
-        //ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
-        ImGui::ProgressBar(coreUsage / 100.0f, ImVec2(200.0f, 20.0f), "");
+        ImGui::PushStyleColor(ImGuiCol_PlotLines, color);
+        ImGui::PlotLines("##history",
+            coreHistories[i].data(),
+            10,           // values count
+            0,            // offset
+            nullptr,      // overlay text
+            0.0f,         // scale min
+            100.0f,       // scale max
+            ImVec2(100.0f, 20.0f));
         ImGui::PopStyleColor();
 
-        // Percentage text
-        {
-            ImGui::SameLine();
-            ImGui::Text("%5.1f%%", coreUsage);
+        ImGui::SameLine();
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
+        ImGui::ProgressBar(averageCoreUsage / 100.0f, ImVec2(100.0f, 20.0f), "");
+        ImGui::PopStyleColor();
+        //ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
+        ////ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+        //ImGui::ProgressBar(coreUsage / 100.0f, ImVec2(200.0f, 20.0f), "");
+        //ImGui::PopStyleColor();
+
+        //// Percentage text
+        //{
+        //    ImGui::SameLine();
+        //    ImGui::Text("%5.1f%%", coreUsage);
             ImGui::EndGroup();
             ImGui::PopID();
-        }
+        //}
 
         // Create 2-column layout
         if ((i + 1) % columns != 0 && i < numCores - 1)
@@ -198,7 +221,6 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
         }
     }
     ImGui::EndChild();
-    ImGui::Separator();
     ImGui::End();
 }
 
@@ -216,7 +238,6 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
         ImPlot::PlotLine("Used", ramHistory.data(), ramHistory.size());
         ImPlot::EndPlot();
     }
-    ImGui::SameLine();
     ImGui::Separator();
     ImGui::Text("%.0fMB installed", (double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024));
     ImGui::Text("%.0fMB used", (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024));

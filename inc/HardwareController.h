@@ -79,7 +79,7 @@ public:
 	float getCPUValue() const;
 	const std::array<float, 10>& getCPUHistory() const;
 	const std::vector<std::array<float, 10>>& getIndividualCoreHistories() const;
-
+	LONG getCPUTemperature();
 
 	// RamMonitor class
 	void setRAMInfo();

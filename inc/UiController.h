@@ -35,14 +35,17 @@ namespace UiController
 	static ImVec4 color;
 	static ImVec4 color2;
 	static float coreUsage = 0.0f;
+	static float averageCoreUsage;
 
 	/////////////////////////////////////////////////////////
 	// actual renderers
 	void renderOptionsAndDockspace();
 	void renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInfo);
-	void renderCPU(const std::atomic<float>& cpuValue, 
-				   const std::array<float, 10>& cpuHistory,
-				   const std::vector<std::array<float, 10>>& coreHistories);
+
+	void renderCPU(const std::atomic<float>& cpuValue,
+					const std::array<float, 10>& cpuHistory,
+					const std::vector<std::array<float, 10>>& coreHistories);
+
 	void renderRAM(const std::atomic<float>& ramValue,
 				   const std::array<float, 10>& ramHistory,
 				   const std::atomic<uint64_t>& ramUsed,

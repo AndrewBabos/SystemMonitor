@@ -15,7 +15,10 @@
 #include <intrin.h>
 #include <algorithm>
 #include <TlHelp32.h>
-//#include <unordered_map>
+#include <comdef.h>
+#include <Wbemidl.h>
+
+#pragma comment(lib, "wbemuuid.lib")
 #pragma comment(lib, "pdh.lib")
 
 class CpuMonitor
@@ -31,13 +34,15 @@ private:
 	std::array<float,10> cpuHistory{};
 	// # of Cores | That cores history
 	std::vector<std::array<float, 10>> coreHistories;  // one history per core
-
 	uint8_t index = 0;
+	LONG cpuTemp;
 
 public:
 	CpuMonitor();
 	void pollCPUMetrics();
 	void stopPolling();
+	HRESULT SetCpuTemperature(LPLONG pTemperature);
+	LONG& getCpuTemperature();
 	const std::string getCPUStr() const;
 	const std::atomic<float>& getCPUValue() const;
 	const std::array<float, 10>& getCPUMetrics() const;

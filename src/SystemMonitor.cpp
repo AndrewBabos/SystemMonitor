@@ -50,16 +50,6 @@ bool SystemMonitor::setVsync() const
     return !vsync;
 }
 
-//const HANDLE& SystemMonitor::getHandle() const
-//{
-//    return hSnap;
-//}
-//
-//const PROCESSENTRY32& SystemMonitor::getProcessEntry() const
-//{
-//    return pe;
-//}
-
 SystemMonitor::~SystemMonitor()
 {
 }

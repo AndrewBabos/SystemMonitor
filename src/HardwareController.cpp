@@ -15,34 +15,12 @@ void HardwareController::getCPUInfo()
 
 void HardwareController::setRAMInfo()
 {
-    ramThread = std::thread([this]()
-    {
-        while (ramRunning.load())
-        {
-            MEMORYSTATUSEX memInfo;
-            memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-            if (GlobalMemoryStatusEx(&memInfo))
-            {
-                uint64_t total = static_cast<uint64_t>(memInfo.ullTotalPhys);
-                uint64_t used = total - static_cast<uint64_t>(memInfo.ullAvailPhys);
-
-                totalPhysRAM.store(total, std::memory_order_relaxed);
-                ramUsed.store(used, std::memory_order_relaxed);
-
-                float percent = static_cast<float>((double)used / (double)total * 100.0);
-                ramValue.store(percent, std::memory_order_relaxed);
-
-                ramHistory[ramIndex] = percent;
-                ramIndex = (ramIndex + 1) % ramHistory.size();
-            }
-            std::this_thread::sleep_for(std::chrono::seconds(2));
-        }
-    });
+    ramMonitor.pollRAMMetrics();
 }
 
 MEMORYSTATUSEX HardwareController::getRAM() const
 {
-    return memInfo;
+    return ramMonitor.getRAM();
 }
 
 std::string HardwareController::getCPUBrandStr() const
@@ -110,22 +88,22 @@ std::map<std::string, std::vector<ProcessInfo>>& HardwareController::getProcessM
 
 std::array<float, 10>& HardwareController::getRAMHistory()
 {
-    return ramHistory;
+    return ramMonitor.getRAMHistory();
 }
 
 std::atomic<float>& HardwareController::getRAMValue()
 {
-    return ramValue;
+    return ramMonitor.getRAMValue();
 }
 
 std::atomic<uint64_t>& HardwareController::getUsedRAM()
 {
-    return ramUsed;
+    return ramMonitor.getUsedRAM();
 }
 
 std::atomic<uint64_t>& HardwareController::getTotalPhysRAM()
 {
-    return totalPhysRAM;
+    return ramMonitor.getTotalPhysRAM();
 }
 
 const HANDLE& HardwareController::getHandle() const
@@ -141,19 +119,11 @@ const PROCESSENTRY32& HardwareController::getProcessEntry() const
 HardwareController::~HardwareController()
 {
     cpuMonitor.stopPolling();
-
-    ramRunning.store(false);
-    /*if (cpuMonitor.getCPUValue())
-    {
-
-    }*/
+    ramMonitor.stopPolling();
 
     if (hSnap != INVALID_HANDLE_VALUE)
         CloseHandle(hSnap);
 
     if (processesThread.joinable())
         processesThread.join();
-
-    if (ramThread.joinable())
-        ramThread.join();
 }

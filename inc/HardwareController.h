@@ -18,6 +18,7 @@
 #pragma comment(lib, "pdh.lib")
 
 #include "CpuMonitor.h"
+#include <RamMonitor.h>
 
 #define thread_Update 450 // 0x1C2 (ms)
 #define length_cpuBrandStr 64 // 0x40 64 bytes length
@@ -42,6 +43,7 @@ class HardwareController
 private:
 	SYSTEM_INFO sysInfo;
 	CpuMonitor cpuMonitor;
+	RamMonitor ramMonitor;
 
 //	Mike Topp
 
@@ -53,19 +55,6 @@ private:
 	PROCESSENTRY32 pe;
 	std::thread processesThread;
 	std::map<std::string, std::vector<ProcessInfo>> processMap;
-
-
-	// ram memory
-	/* TODO:
-	*		throw this into its own monitor
-	*/
-	std::thread ramThread;
-	MEMORYSTATUSEX memInfo;
-	std::atomic<bool> ramRunning{ true };
-	std::array<float, 10> ramHistory{};
-	std::atomic<float> ramValue; // percent
-	std::atomic<uint64_t> ramUsed, totalPhysRAM{0};
-	uint8_t ramIndex = 0;
 
 	// glfw
 	bool vsync;

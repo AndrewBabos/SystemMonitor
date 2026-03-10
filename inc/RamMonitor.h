@@ -10,16 +10,20 @@
 class RamMonitor
 {
 private:
+	std::atomic<bool> running;
 	std::thread ramThread;
 	MEMORYSTATUSEX memInfo;
-	std::atomic<bool> ramRunning{ true };
+	//std::atomic<bool> ramRunning{ true };
 	std::array<float, 10> ramHistory{};
 	std::atomic<float> ramValue; // percent
 	std::atomic<uint64_t> ramUsed, totalPhysRAM{ 0 };
 	uint8_t ramIndex = 0;
 
 public:
-	void setRAMInfo();
+	RamMonitor();
+	~RamMonitor();
+	void pollRAMMetrics();
+	void stopPolling();
 	MEMORYSTATUSEX getRAM() const;
 	std::array<float, 10>& getRAMHistory();
 	std::atomic<float>& getRAMValue();

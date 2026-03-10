@@ -29,7 +29,6 @@ namespace UiController
 	static bool isSelected = false;
 	static uint16_t selectedIndex = -1;
 	static std::string nameTemp = "";
-	//static char pidTempStr[16]{};
 	static DWORD pidTemp;
 	static uint8_t columns = 2;
 	static ImVec4 color;

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "imgui.h"
-#include "implot.h"
 #include <iostream>
 #include <cstdint>
 #include <windows.h>

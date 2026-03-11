@@ -136,7 +136,8 @@ void UiController::renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInf
     //ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
     ImGui::Text("CPU Clock Frequency: <work in progress>");
     ImGui::Text("Number of Cores:   %d", sysInfo.dwNumberOfProcessors);
-    ImGui::Text("Processor Architecture:   %d", sysInfo.wProcessorArchitecture);
+    if (sysInfo.wProcessorArchitecture == 9)
+        ImGui::Text("Processor Architecture:   x86-64", sysInfo.wProcessorArchitecture);
     ImGui::Separator();
     ImGui::End();
 }
@@ -230,6 +231,9 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
                              const std::atomic<uint64_t>& totalPhysRAM)
 {
     ImGui::Begin("RAM");
+    //double installedRAM = (double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024);
+    //double usedRAM = (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024);
+    //double percentUsed = ((double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024)) / ((double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024)) * 100;
     if (ImPlot::BeginPlot("RAM Usage", ImVec2(300, 300)))
     {
         ImPlot::SetupAxes("Intervals (Every 3s)", "Percent Used");
@@ -239,9 +243,14 @@ void UiController::renderRAM(const std::atomic<float>& ramValue,
         ImPlot::EndPlot();
     }
     ImGui::Separator();
-    ImGui::Text("%.0fMB installed", (double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024));
-    ImGui::Text("%.0fMB used", (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024));
-    ImGui::Text("%.0fMB available", ((double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024) - (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024)));
+    //ImGui::Text("%.0fMB installed", installedRAM);
+    //ImGui::Text("Used:      %.0fMB / %.0fMB (%.0f%%)", usedRAM, installedRAM, percentUsed);
+    //ImGui::Text("Available: %.0fMB", ((double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024) - (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024)));
+    //ImGui::Text("Cached ( **FIX ME** ):    %.0fMB");
+
+    ImGui::Text("Used:      %.0fMB / %.0fMB (%.0f%%)", (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024), (double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024), ((double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024)) / ((double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024)) * 100);
+    ImGui::Text("Available: %.0fMB", ((double)totalPhysRAM.load(std::memory_order_relaxed) / (1024 * 1024) - (double)ramUsed.load(std::memory_order_relaxed) / (1024 * 1024)));
+    ImGui::Text("Cached ( **FIX ME** ):    %.0fMB");
     ImGui::End();
 }
 

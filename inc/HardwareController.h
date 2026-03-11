@@ -19,6 +19,7 @@
 
 #include "CpuMonitor.h"
 #include <RamMonitor.h>
+#include <ProcessesMonitor.h>
 
 #define thread_Update 450 // 0x1C2 (ms)
 #define length_cpuBrandStr 64 // 0x40 64 bytes length
@@ -44,6 +45,7 @@ private:
 	SYSTEM_INFO sysInfo;
 	CpuMonitor cpuMonitor;
 	RamMonitor ramMonitor;
+	ProcessesMonitor processesMonitor;
 
 //	Mike Topp
 

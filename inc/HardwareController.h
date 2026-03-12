@@ -18,6 +18,7 @@
 #include "CpuMonitor.h"
 #include <RamMonitor.h>
 #include "ProcessesMonitor.h"
+#include <NetworkMonitor.h>
 
 #define thread_Update 450 // 0x1C2 (ms)
 #define length_cpuBrandStr 64 // 0x40 64 bytes length
@@ -42,6 +43,9 @@ private:
 	CpuMonitor cpuMonitor;
 	RamMonitor ramMonitor;
 	ProcessesMonitor processesMonitor;
+
+	// when im finished
+	//NetworkMonitor networkMonitor;
 
 //	Mike Topp
 
@@ -72,6 +76,10 @@ public:
 	std::map<std::string, std::vector<ProcessInfo>>& getProcessMap();
 	const HANDLE& getHandle() const;
 	const PROCESSENTRY32& getProcessEntry() const;
+
+	// NetworkMonitor class
+	// <stuff here>
+
 	~HardwareController();
 };
 

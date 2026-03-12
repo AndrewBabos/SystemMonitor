@@ -3,8 +3,6 @@
 
 HardwareController::HardwareController()
 {
-    //hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    //pe.dwSize = sizeof(PROCESSENTRY32);
 	vsync = false;
 }
 

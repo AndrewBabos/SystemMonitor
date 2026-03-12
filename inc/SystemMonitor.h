@@ -1,6 +1,4 @@
 #pragma once
-#include "imgui.h"
-#include "implot.h"
 #include <iostream>
 #include <windows.h>
 #include <thread>

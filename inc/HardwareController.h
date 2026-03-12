@@ -1,6 +1,4 @@
 #pragma once
-#include "imgui.h"
-#include "implot.h"
 #include <iostream>
 #include <cstdint>
 #include <windows.h>
@@ -19,7 +17,7 @@
 
 #include "CpuMonitor.h"
 #include <RamMonitor.h>
-#include <ProcessesMonitor.h>
+#include "ProcessesMonitor.h"
 
 #define thread_Update 450 // 0x1C2 (ms)
 #define length_cpuBrandStr 64 // 0x40 64 bytes length
@@ -27,18 +25,16 @@
 /* TODO:
 	*		throw this into processes monitor
 	*/
-struct ProcessInfo
-{
-	DWORD pid;
-	//std::string name;
-	float cpuUsage;
-	float memoryUsage;
-	float gpuUsage;
-	float networkUsage;
-};
+//struct ProcessInfo
+//{
+//	DWORD pid;
+//	//std::string name;
+//	float cpuUsage;
+//	float memoryUsage;
+//	float gpuUsage;
+//	float networkUsage;
+//};
 
-// probably dont need this, class into class into class just makes it
-// redundant. SystemMonitor Class seems like HwCtrl anyway
 class HardwareController
 {
 private:
@@ -53,10 +49,10 @@ private:
 	/* TODO:
 	*		throw this into its own monitor
 	*/
-	HANDLE hSnap;
-	PROCESSENTRY32 pe;
-	std::thread processesThread;
-	std::map<std::string, std::vector<ProcessInfo>> processMap;
+	//HANDLE hSnap;
+	//PROCESSENTRY32 pe;
+	//std::thread processesThread;
+	//std::map<std::string, std::vector<ProcessInfo>> processMap;
 
 	// glfw
 	bool vsync;

@@ -3,8 +3,8 @@
 
 HardwareController::HardwareController()
 {
-    hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    pe.dwSize = sizeof(PROCESSENTRY32);
+    //hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    //pe.dwSize = sizeof(PROCESSENTRY32);
 	vsync = false;
 }
 
@@ -53,37 +53,38 @@ const std::vector<std::array<float, 10>>& HardwareController::getIndividualCoreH
 
 void HardwareController::getProcessesInfo()
 {
-    if (hSnap == INVALID_HANDLE_VALUE)
-    {
-        std::cout << "ERROR GETTING stuff idk\n";
-        return;
-    }
-    processesThread = std::thread([this]() 
-    {
-            hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-            pe.dwSize = sizeof(PROCESSENTRY32);
-            if (Process32First(hSnap, &pe))
-            {
-                do
-                {
-                    ProcessInfo info{};
-                    info.pid = pe.th32ProcessID;
-                    info.cpuUsage = 0.0f;
-                    info.memoryUsage = 0.0f;
-                    info.gpuUsage = 0.0f;
-                    info.networkUsage = 0.0f;
+    //if (hSnap == INVALID_HANDLE_VALUE)
+    //{
+    //    std::cout << "ERROR GETTING stuff idk\n";
+    //    return;
+    //}
+    //processesThread = std::thread([this]() 
+    //{
+    //        hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    //        pe.dwSize = sizeof(PROCESSENTRY32);
+    //        if (Process32First(hSnap, &pe))
+    //        {
+    //            do
+    //            {
+    //                ProcessInfo info{};
+    //                info.pid = pe.th32ProcessID;
+    //                info.cpuUsage = 0.0f;
+    //                info.memoryUsage = 0.0f;
+    //                info.gpuUsage = 0.0f;
+    //                info.networkUsage = 0.0f;
 
-                    //processMap[info.name].push_back(info);
-                    processMap[pe.szExeFile].push_back(info);
-                } while (Process32Next(hSnap, &pe));
-            }
-            CloseHandle(hSnap);
-    });
+    //                //processMap[info.name].push_back(info);
+    //                processMap[pe.szExeFile].push_back(info);
+    //            } while (Process32Next(hSnap, &pe));
+    //        }
+    //        CloseHandle(hSnap);
+    //});
+    processesMonitor.pollProcessesInfo();
 }
 
 std::map<std::string, std::vector<ProcessInfo>>& HardwareController::getProcessMap()
 {
-    return processMap;
+    return processesMonitor.getProcessMap();
 }
 
 std::array<float, 10>& HardwareController::getRAMHistory()
@@ -108,12 +109,12 @@ std::atomic<uint64_t>& HardwareController::getTotalPhysRAM()
 
 const HANDLE& HardwareController::getHandle() const
 {
-    return hSnap;
+    return processesMonitor.getHandle();
 }
 
 const PROCESSENTRY32& HardwareController::getProcessEntry() const
 {
-    return pe;
+    return processesMonitor.getProcessEntry();
 }
 
 HardwareController::~HardwareController()
@@ -124,10 +125,13 @@ HardwareController::~HardwareController()
     printf("shutting down RamMonitor\n");
     ramMonitor.stopPolling();
     printf("RamMonitor shut down...\n");
+    printf("shutting down CpuMonitor\n");
+    processesMonitor.stopPolling();
+    printf("ProcessesMonitor shut down...\n");
 
-    if (hSnap != INVALID_HANDLE_VALUE)
-        CloseHandle(hSnap);
+    //if (hSnap != INVALID_HANDLE_VALUE)
+    //    CloseHandle(hSnap);
 
-    if (processesThread.joinable())
-        processesThread.join();
+    //if (processesThread.joinable())
+    //    processesThread.join();
 }

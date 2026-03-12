@@ -1,5 +1,4 @@
-#include "imgui.h"
-#include "implot.h"
+#pragma once
 #include <windows.h>
 #include <thread>
 #include <chrono>

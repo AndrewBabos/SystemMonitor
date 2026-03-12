@@ -1,5 +1,18 @@
+#pragma once
 #include <iostream>
-#include <SystemMonitor.h>
+#include <cstdint>
+#include <windows.h>
+#include <thread>
+#include <chrono>
+#include <array>
+#include <vector>
+#include <map>
+#include <pdh.h>
+#include <pdhmsg.h>
+#include <intrin.h>
+#include <TlHelp32.h>
+#include <unordered_map>
+#pragma comment(lib, "pdh.lib")
 
 struct ProcessInfo
 {

@@ -34,7 +34,7 @@ It displays real-time CPU and RAM usage, along with detailed process information
 | **ImPlot** | Graph plotting |
 | **GLFW / OpenGL** | Windowing and graphics backend |
 | **PDH** | CPU performance data |
-| **psapi.h / tlhelp32.h** | Process and memory enumeration |
+| **psapi.h / tlhelp32.h** | Process, Network and Memory enumeration |
 
 ### Link against:
 ```

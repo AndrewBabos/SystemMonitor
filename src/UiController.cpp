@@ -142,8 +142,6 @@ void UiController::renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInf
     ImGui::End();
 }
 
-
-
 void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core usage
                              const std::array<float, 10>& cpuHistory, // total core usage over 10 checks
                              const std::vector<std::array<float, 10>>& coreHistories) // individual cores)

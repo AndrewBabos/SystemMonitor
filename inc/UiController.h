@@ -57,11 +57,8 @@ namespace UiController
 	////////////////////////////////////////////////////////
 
 
-	// TODO LOOK AT THE PARAMETERS
 	// logic functions
-	//void openPropertiesTab(DWORD pid); // might not need parameter
-	void openPropertiesTab(); // might not need parameter
-	//void endProcessTask(DWORD pid);// might not need parameter
-	void endProcessTask();// might not need parameter
+	void openPropertiesTab();
+	void endProcessTask();
 };
 

@@ -45,15 +45,6 @@ private:
 
 //	Mike Topp
 
-	// processes list
-	/* TODO:
-	*		throw this into its own monitor
-	*/
-	//HANDLE hSnap;
-	//PROCESSENTRY32 pe;
-	//std::thread processesThread;
-	//std::map<std::string, std::vector<ProcessInfo>> processMap;
-
 	// glfw
 	bool vsync;
 

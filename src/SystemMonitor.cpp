@@ -3,13 +3,8 @@
 // all hardware getters and setters be placed here
 SystemMonitor::SystemMonitor()
 {
-    //hwCtrl = new HardwareController();
     hwCtrl = std::make_unique<HardwareController>();
     vsync = false;
-
-    // list of processes
-    /*hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    pe.dwSize = sizeof(PROCESSENTRY32);*/
 
     hwCtrl->getCPUInfo();
     hwCtrl->getProcessesInfo();

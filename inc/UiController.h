@@ -35,6 +35,7 @@ namespace UiController
 	static ImVec4 color2;
 	static float coreUsage = 0.0f;
 	static float averageCoreUsage;
+	static std::string percentSingleCoreBuffer;
 
 	/////////////////////////////////////////////////////////
 	// actual renderers

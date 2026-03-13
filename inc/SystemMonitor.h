@@ -17,10 +17,6 @@
 
 #pragma comment(lib, "pdh.lib")
 
-//#define thread_Update 0x1C2 // 450
-//#define length_cpuBrandStr 0x40 // 64 bytes length
-
-
 class SystemMonitor
 {
 private:

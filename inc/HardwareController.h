@@ -23,18 +23,6 @@
 #define thread_Update 450 // 0x1C2 (ms)
 #define length_cpuBrandStr 64 // 0x40 64 bytes length
 
-/* TODO:
-	*		throw this into processes monitor
-	*/
-//struct ProcessInfo
-//{
-//	DWORD pid;
-//	//std::string name;
-//	float cpuUsage;
-//	float memoryUsage;
-//	float gpuUsage;
-//	float networkUsage;
-//};
 
 class HardwareController
 {

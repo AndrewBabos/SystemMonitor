@@ -85,6 +85,7 @@ void CpuMonitor::pollCPUMetrics()
 
     SetThreadPriority(cpuThread.native_handle(), THREAD_PRIORITY_LOWEST);
 }
+
 void CpuMonitor::stopPolling()
 {
     if (!running.exchange(false))

@@ -33,7 +33,7 @@ void SystemMonitor::render()
                                     hwCtrl->getProcessMap());
 
 
-    // references to their docs
+    // references to docs
     ImGui::ShowDemoWindow();
     //ImPlot::ShowDemoWindow();
 

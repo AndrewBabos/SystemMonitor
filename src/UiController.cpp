@@ -133,7 +133,6 @@ void UiController::renderSysInfo(std::string CPUBrandString, SYSTEM_INFO& sysInf
 {
     ImGui::Begin("System Information");
     ImGui::Text("Processor:          %s", CPUBrandString.c_str());
-    //ImGui::Text("CPU Usage: %.2f%%", cpuValue.load());
     ImGui::Text("CPU Clock Frequency: <work in progress>");
     ImGui::Text("Number of Cores:   %d", sysInfo.dwNumberOfProcessors);
     if (sysInfo.wProcessorArchitecture == 9)
@@ -163,8 +162,6 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
     ImGui::Separator();
     ////////////////////
 
-    // TODO:
-    // figure out why the grid is updating so slow
     ImGui::BeginChild("Grid-View");
     ImGui::Text("Individual Cores");
 
@@ -178,10 +175,10 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
         // depending on USAGE, the color cycles
         coreUsage = coreHistories[i][0];
         averageCoreUsage = std::accumulate(coreHistories[i].begin(), coreHistories[i].end(), 0.0f) / 10.0f;
-        
+        percentSingleCoreBuffer = std::format("{:.2f}%", averageCoreUsage);
         color = averageCoreUsage < 50 ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f) :  // GREEN
                 averageCoreUsage < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f) :  // YELLOW
-                                        ImVec4(0.9f, 0.2f, 0.2f, 1.0f);  // RED
+                                        ImVec4(0.9f, 0.2f, 0.2f, 1.0f);   // RED
 
         ImGui::PushStyleColor(ImGuiCol_PlotLines, color);
         ImGui::PlotLines("##history",
@@ -196,20 +193,10 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
 
         ImGui::SameLine();
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
-        ImGui::ProgressBar(averageCoreUsage / 100.0f, ImVec2(100.0f, 20.0f), "");
+        ImGui::ProgressBar(averageCoreUsage / 100.0f, ImVec2(100.0f, 20.0f), percentSingleCoreBuffer.c_str());
         ImGui::PopStyleColor();
-        //ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
-        ////ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
-        //ImGui::ProgressBar(coreUsage / 100.0f, ImVec2(200.0f, 20.0f), "");
-        //ImGui::PopStyleColor();
-
-        //// Percentage text
-        //{
-        //    ImGui::SameLine();
-        //    ImGui::Text("%5.1f%%", coreUsage);
-            ImGui::EndGroup();
-            ImGui::PopID();
-        //}
+        ImGui::EndGroup();
+        ImGui::PopID();
 
         // Create 2-column layout
         if ((i + 1) % columns != 0 && i < numCores - 1)

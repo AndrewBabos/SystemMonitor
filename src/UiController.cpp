@@ -147,13 +147,13 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
 {
     ImGui::Begin("CPU");
     uint8_t numCores = coreHistories.size();
-    std::string percentBuffer = std::to_string(cpuValue.load()) + "%";
     color2 =    cpuValue.load() < 50 ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f) :  // GREEN
                 cpuValue.load() < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f) :  // YELLOW
                                        ImVec4(0.9f, 0.2f, 0.2f, 1.0f);  // RED
 
     ImGui::Text("Total CPU Usage"); ImGui::SameLine();
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color2);
+    std::string percentBuffer = std::format("{:.2f}%", cpuValue.load());
     ImGui::ProgressBar(cpuValue.load() / 100.0f, ImVec2(200.0f, 20.0f), percentBuffer.c_str());
     //ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
     ImGui::PopStyleColor();
@@ -175,6 +175,7 @@ void UiController::renderCPU(const std::atomic<float>& cpuValue, // total core u
         // depending on USAGE, the color cycles
         coreUsage = coreHistories[i][0];
         averageCoreUsage = std::accumulate(coreHistories[i].begin(), coreHistories[i].end(), 0.0f) / 10.0f;
+
         percentSingleCoreBuffer = std::format("{:.2f}%", averageCoreUsage);
         color = averageCoreUsage < 50 ? ImVec4(0.2f, 0.8f, 0.2f, 1.0f) :  // GREEN
                 averageCoreUsage < 80 ? ImVec4(0.9f, 0.9f, 0.2f, 1.0f) :  // YELLOW

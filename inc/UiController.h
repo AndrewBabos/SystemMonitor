@@ -58,7 +58,7 @@ namespace UiController
 	////////////////////////////////////////////////////////
 
 
-	// logic functions
+	// logic functions (windows)
 	void openPropertiesTab();
 	void endProcessTask();
 };

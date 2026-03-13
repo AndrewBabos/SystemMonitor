@@ -25,17 +25,16 @@
 
 namespace UiController
 {
-	// let me cook
 	static bool isSelected = false;
 	static uint16_t selectedIndex = -1;
 	static std::string nameTemp = "";
 	static DWORD pidTemp;
 	static uint8_t columns = 2;
-	static ImVec4 color;
-	static ImVec4 color2;
+	static ImVec4 color{};
+	static ImVec4 color2{};
 	static float coreUsage = 0.0f;
-	static float averageCoreUsage;
-	static std::string percentSingleCoreBuffer;
+	static float averageCoreUsage = 0.0f;
+	static std::string percentSingleCoreBuffer = "";
 
 	/////////////////////////////////////////////////////////
 	// actual renderers

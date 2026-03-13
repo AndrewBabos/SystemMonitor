@@ -73,10 +73,8 @@ void CpuMonitor::pollCPUMetrics()
 
                 // per core
                 for (size_t core = 0; core < coreCount; ++core)
-                {
                     if (PdhGetFormattedCounterValue(coreCounters[core], PDH_FMT_DOUBLE, nullptr, &v) == ERROR_SUCCESS)
                         coreHistories[core][index] = static_cast<float>(v.doubleValue);
-                }
 
                 index = (index + 1) % cpuHistory.size();
                 std::this_thread::sleep_for(std::chrono::milliseconds(450));
